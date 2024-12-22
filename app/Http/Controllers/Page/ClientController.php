@@ -25,6 +25,10 @@ class ClientController extends Controller
     // Store the job post details in the database
     public function storeJobPost(Request $request)
     {
+         // Check if the user is authenticated
+    if (!auth()->check()) {
+        return redirect()->route('login')->with('error', 'You need to log in first!');
+    } 
         $request->validate([
             'jobTitle' => 'required|string|max:255',
             'jobDescription' => 'required|string',
