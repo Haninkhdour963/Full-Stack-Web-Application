@@ -1,23 +1,32 @@
 @extends('layouts.masterPage')
 
 @section('content')
-<!-- Header End -->
-<div class="container-xxl py-5 bg-dark page-header mb-5">
-    <div class="container my-5 pt-5 pb-4 text-center">
-        <h1 class="display-3 text-white mb-3 animated slideInDown">Create Job Post</h1>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb text-uppercase justify-content-center">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item"><a href="#">Pages</a></li>
-                <li class="breadcrumb-item text-white active" aria-current="page">Job</li>
-            </ol>
-        </nav>
-    </div>
-</div>
+
+     <!-- Header End -->
+     <div class="container-xxl py-5 bg-dark page-header mb-5">
+            <div class="container my-5 pt-5 pb-4">
+                <h1 class="display-3 text-white mb-3 animated slideInDown">Create Job Post </h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb text-uppercase">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item"><a href="#">Pages</a></li>
+                        <li class="breadcrumb-item text-white active" aria-current="page">Job</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <!-- Header End -->
 
 <div class="container py-5">
     <h2 class="text-center mb-4">Post a New Job</h2>
-    <form method="POST" action="{{ route('page.clients.post') }}" class="bg-light p-4 rounded shadow-sm">
+
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    <form method="POST" action="{{ route('page.clients.storeJobPost') }}" class="bg-light p-4 rounded shadow-sm">
         @csrf
 
         <div class="row mb-3">
@@ -62,10 +71,7 @@
             <textarea class="form-control" id="skills" name="skills" rows="3" placeholder="List required skills" required></textarea>
         </div>
 
-        <div class="mb-3">
-            <label for="deadline" class="form-label">Deadline</label>
-            <input type="date" class="form-control" id="deadline" name="deadline" required>
-        </div>
+       
 
         <div class="text-center">
             <button type="submit" class="btn btn-primary btn-lg">Post Job</button>

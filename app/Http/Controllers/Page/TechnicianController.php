@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Page;
 
 use App\Http\Controllers\Controller;
+use App\Models\JobBid;
 use Illuminate\Http\Request;
 
 class TechnicianController extends Controller
@@ -20,8 +21,12 @@ class TechnicianController extends Controller
     }
     public function manageContracts()
     {
-        // Return the view for managing contracts
-        return view('page.technicians.contract');  // Ensure the view exists at resources/views/page/technicians/contracts.blade.php
+        // Fetch job bids with the related job and technician data
+        $bids = JobBid::whereIn('status', ['pending', 'accepted'])
+            ->with(['job', 'technician'])  // Eager load related job and technician
+            ->get();
+
+        return view('page.technicians.contract', compact('bids'));  // Ensure the view exists at resources/views/page/technicians/contracts.blade.php
     }
     public function bidOnJob()
     {

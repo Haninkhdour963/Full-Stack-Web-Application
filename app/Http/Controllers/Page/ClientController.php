@@ -21,43 +21,48 @@ class ClientController extends Controller
         // Return the view for creating a job post
         return view('page.clients.post');  // Ensure the view exists at resources/views/page/clients/createJobPost.blade.php
     }
-// Store the job post details in the database
-public function storeJobPost(Request $request)
-{
-    $request->validate([
-        'jobTitle' => 'required|string|max:255',
-        'jobDescription' => 'required|string',
-        'location' => 'required|string|max:255',
-        'category' => 'required|integer',
-        'budget_min' => 'required|numeric',
-        'budget_max' => 'required|numeric',
-        'skills' => 'required|string',
-        'posted_at' => 'required|date',
-    ]);
 
-    // Save the job post into the database
-    // Assuming you have a JobPost model
-    JobPosting::create([
-        'title' => $request->jobTitle,
-        'description' => $request->jobDescription,
-        'location' => $request->location,
-        'category_id' => $request->category,
-        'budget_min' => $request->budget,
-        'budget_max' => $request->budget,
-        'skills' => $request->skills,
-        'posted_at' => $request->deadline,
-    ]);
+    // Store the job post details in the database
+    public function storeJobPost(Request $request)
+    {
+        $request->validate([
+            'jobTitle' => 'required|string|max:255',
+            'jobDescription' => 'required|string',
+            'location' => 'required|string|max:255',
+            'category' => 'required|integer',
+            'budgetMin' => 'required|numeric',
+            'budgetMax' => 'required|numeric',
+            'skills' => 'required|string'
+        ]);
 
-    // Redirect back with a success message
-    return redirect()->route('page.clients.post')->with('success', 'Job post created successfully!');
-}
+        // Save the job post into the database
+        JobPosting::create([
+            'client_id' => auth()->user()->id, // Assuming the logged-in user is the client
+            'title' => $request->jobTitle,
+            'description' => $request->jobDescription,
+            'location' => $request->location,
+            'category_id' => $request->category,
+            'budget_min' => $request->budgetMin,
+            'budget_max' => $request->budgetMax,
+            'skills' => $request->skills,
+            'status' => 'open', // Default status (assuming the job is open)
+            'posted_at' => now(),
+        ]);
 
+        // Redirect to contract page after job is created
+        return redirect()->route('page.clients.contract')->with('success', 'Job post created successfully!');
+    }
 
     public function signContract()
     {
+        $jobPosts = JobPosting::whereIn('status', ['open', 'completed'])
+                              ->with('category')  // Eager load the category relationship
+                              ->get();
         // Return the view for signing a contract
-        return view('page.clients.contract');  // Ensure the view exists at resources/views/page/clients/signContract.blade.php
+
+        return view('page.clients.contract',compact('jobPosts'));  // Ensure the view exists at resources/views/page/clients/signContract.blade.php
     }
+
     public function hireTechnician()
     {
         // Return the view for hiring a technician
