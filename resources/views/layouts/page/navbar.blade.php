@@ -17,8 +17,7 @@
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown">Jobs</a>
                 <div class="dropdown-menu rounded-0 m-0">
-                <a href="{{ route('page.technicians.bid') }}" class="dropdown-item">Technician List</a>
-                    <a href="{{ route('page.clients.post') }}" class="dropdown-item">Job Posting</a>
+                <a href="{{ route('page.technicians.bid') }}" class="dropdown-item">Technician List</a>   
                     <a href="{{ route('page.clients.contract') }}" class="dropdown-item">Sign Contracts</a>
                 </div>
             </div>

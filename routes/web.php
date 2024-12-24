@@ -58,8 +58,7 @@ Route::get('/filter-by-location', [PageHomeController::class, 'filterByLocation'
 Route::get('/explore-by-category', [PageHomeController::class, 'exploreByCategory']);
 
 
-// web.php (Route definition)
-Route::get('/reviews', [PageHomeController::class, 'allReviews'])->name('reviews');
+
 
 
     

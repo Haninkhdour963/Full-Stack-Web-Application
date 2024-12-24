@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Page;
 
 use App\Http\Controllers\Controller;
 use App\Models\JobBid;
+use App\Models\Technician;
 use Illuminate\Http\Request;
 
 class TechnicianController extends Controller
@@ -11,16 +12,23 @@ class TechnicianController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('page.technicians.profile');
+        // Get paginated technicians
+        $technicians = Technician::paginate(10);  // Adjust the number per page as needed
+        
+        // Return the view with the paginated technicians
+        return view('page.technician.bid', compact('technicians'));
     }
 
     public function createProfile(){
         return view('page.technicians.profile');
+        
     }
+ 
     public function manageContracts()
     {
+      
         // Fetch job bids with the related job and technician data
         $bids = JobBid::whereIn('status', ['pending', 'accepted'])
             ->with(['job', 'technician'])  // Eager load related job and technician

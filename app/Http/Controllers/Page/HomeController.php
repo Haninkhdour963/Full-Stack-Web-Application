@@ -16,8 +16,15 @@ class HomeController extends Controller
      */
     public function index(Request $request)
     {
-        // Fetch all categories for the dropdown
-        $categories = Category::all();
+          // Fetch the last 3 categories (or use paginate if you want to paginate categories)
+          $categories = Category::paginate(10); // Use paginate instead of limit to enable pagination
+
+        
+       
+
+   
+    // Fetch 10 random reviews
+    $reviews = Review::inRandomOrder()->limit(10)->get();
         
         // Start the query for job postings
         $query = JobPosting::query();
@@ -66,38 +73,11 @@ class HomeController extends Controller
         }
     
         // Return the view with the necessary data
-        return view('index', compact('jobPostings', 'categories'));
+        return view('index', compact('jobPostings', 'categories', 'reviews'));
     }
     
     
-    // HomeController.php
-
-// HomeController.php
-
-// HomeController.php or PageHomeController.php
-
-// HomeController.php or PageHomeController.php
-
-// HomeController.php or PageHomeController.php
-
-// HomeController.php or PageHomeController.php
-
-public function allReviews()
-{
-    // Fetch all reviews with related reviewer and job data
-    $reviews = Review::with('reviewer', 'job')->get();  // Fetch reviews with related data
-
-    // Log the reviews to debug
-    \Log::debug('Fetched reviews:', $reviews->toArray());  // Correct logging syntax
-
-    // Check if reviews are fetched correctly
-    if ($reviews->isEmpty()) {
-        \Log::debug('No reviews found.');
-    }
-
-    // Return the view and pass the reviews variable
-    return view('index', compact('reviews'));  // Ensure the 'reviews' variable is passed here
-}
+    
 
 
 

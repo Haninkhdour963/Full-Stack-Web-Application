@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -23,9 +24,27 @@ class EventServiceProvider extends ServiceProvider
     /**
      * Register any events for your application.
      */
-    public function boot(): void
+    public function boot()
     {
-        //
+        parent::boot();
+    
+        Event::listen(Authenticated::class, function ($event) {
+            $user = $event->user;
+    
+            if ($user->isAdmin()) {
+                return redirect()->route('admin.dashboard');
+            }
+    
+            if ($user->isClient()) {
+                return redirect()->route('client.dashboard');
+            }
+    
+            if ($user->isTechnician()) {
+                return redirect()->route('technician.dashboard');
+            }
+    
+            return redirect()->route('index'); // Fallback route
+        });
     }
 
     /**

@@ -4,13 +4,13 @@
 
 <!-- Header Start -->
 <div class="container-xxl py-5 bg-dark page-header mb-5">
-    <div class="container my-5 pt-5 pb-4 text-center">
-        <h1 class="display-3 text-white mb-3 animated slideInDown">Create Technician Profile</h1>
+            <div class="container my-5 pt-5 pb-4">
+                <h1 class="display-3 text-white mb-3 animated slideInDown">Profile</h1>
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb text-uppercase justify-content-center">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item"><a href="#">Pages</a></li>
-                <li class="breadcrumb-item text-white active" aria-current="page">Technician Profile</li>
+                    <ol class="breadcrumb text-uppercase">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item"><a href="#">Pages</a></li>
+                        <li class="breadcrumb-item text-white active" aria-current="page">Technician </li>
             </ol>
         </nav>
     </div>

@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Page;
 
 use App\Http\Controllers\Controller;
 use App\Models\JobPosting;
+use App\Models\Technician;
 use Illuminate\Http\Request;
 
 class ClientController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */
@@ -22,40 +24,46 @@ class ClientController extends Controller
         return view('page.clients.post');  // Ensure the view exists at resources/views/page/clients/createJobPost.blade.php
     }
 
-    // Store the job post details in the database
-    public function storeJobPost(Request $request)
-    {
-         // Check if the user is authenticated
+   public function storeJobPost(Request $request)
+{
+    // Check if the user is authenticated
     if (!auth()->check()) {
         return redirect()->route('login')->with('error', 'You need to log in first!');
-    } 
-        $request->validate([
-            'jobTitle' => 'required|string|max:255',
-            'jobDescription' => 'required|string',
-            'location' => 'required|string|max:255',
-            'category' => 'required|integer',
-            'budgetMin' => 'required|numeric',
-            'budgetMax' => 'required|numeric',
-            'skills' => 'required|string'
-        ]);
-
-        // Save the job post into the database
-        JobPosting::create([
-            'client_id' => auth()->user()->id, // Assuming the logged-in user is the client
-            'title' => $request->jobTitle,
-            'description' => $request->jobDescription,
-            'location' => $request->location,
-            'category_id' => $request->category,
-            'budget_min' => $request->budgetMin,
-            'budget_max' => $request->budgetMax,
-            'skills' => $request->skills,
-            'status' => 'open', // Default status (assuming the job is open)
-            'posted_at' => now(),
-        ]);
-
-        // Redirect to contract page after job is created
-        return redirect()->route('page.clients.contract')->with('success', 'Job post created successfully!');
     }
+
+    // Check if the user has the 'client' role
+    if (auth()->user()->user_role !== 'client') {
+        return redirect()->route('register')->with('error', 'You need to register as a client to create a job post.');
+    }
+
+    $request->validate([
+        'jobTitle' => 'required|string|max:255',
+        'jobDescription' => 'required|string',
+        'location' => 'required|string|max:255',
+        'category' => 'required|integer',
+        'budgetMin' => 'required|numeric',
+        'budgetMax' => 'required|numeric',
+        'skills' => 'required|string'
+    ]);
+
+    // Save the job post into the database
+    JobPosting::create([
+        'client_id' => auth()->user()->id, // Assuming the logged-in user is the client
+        'title' => $request->jobTitle,
+        'description' => $request->jobDescription,
+        'location' => $request->location,
+        'category_id' => $request->category,
+        'budget_min' => $request->budgetMin,
+        'budget_max' => $request->budgetMax,
+        'skills' => $request->skills,
+        'status' => 'open', // Default status (assuming the job is open)
+        'posted_at' => now(),
+    ]);
+
+    // Redirect to contract page after job is created
+    return redirect()->route('page.clients.contract')->with('success', 'Job post created successfully!');
+}
+
 
     public function signContract()
     {
@@ -69,8 +77,9 @@ class ClientController extends Controller
 
     public function hireTechnician()
     {
-        // Return the view for hiring a technician
-        return view('page.clients.hire');  // Ensure the view exists at resources/views/page/clients/hireTechnician.blade.php
+        
+         $technicians = Technician::paginate(10);
+    return view('page.clients.hire', compact('technicians'));
     }
 
     /**
