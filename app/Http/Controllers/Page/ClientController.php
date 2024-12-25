@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Page;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\JobPosting;
 use App\Models\Technician;
+use GuzzleHttp\Middleware;
 use Illuminate\Http\Request;
 
 class ClientController extends Controller
@@ -64,24 +66,47 @@ class ClientController extends Controller
     return redirect()->route('page.clients.contract')->with('success', 'Job post created successfully!');
 }
 
+public function signContract(Request $request)
+{
+    // Get filter options (status, category) from the request, or set defaults
+    $statusFilter = $request->get('status', 'open'); // Default to 'open'
+    $categoryFilter = $request->get('category', null); // Default to no category filter
 
-    public function signContract()
+    // Get job postings based on filters, also including pagination
+    $jobPosts = JobPosting::query()
+        ->when($statusFilter, function ($query, $statusFilter) {
+            return $query->where('status', $statusFilter);
+        })
+        ->when($categoryFilter, function ($query, $categoryFilter) {
+            return $query->where('category_id', $categoryFilter);
+        })
+        ->with('category')  // Eager load the category relationship
+        ->paginate(10); // Add pagination with 10 items per page
+
+    // Get all available categories for the filter dropdown
+    $categories = Category::all();
+
+    // Return the view for signing a contract, passing job postings, filters, and categories
+    return view('page.clients.contract', compact('jobPosts', 'statusFilter', 'categoryFilter', 'categories'));
+}
+
+
+
+    public function hireTechnician(Request $request)
     {
-        $jobPosts = JobPosting::whereIn('status', ['open', 'completed'])
-                              ->with('category')  // Eager load the category relationship
-                              ->get();
-        // Return the view for signing a contract
-
-        return view('page.clients.contract',compact('jobPosts'));  // Ensure the view exists at resources/views/page/clients/signContract.blade.php
+        // Get the filter type from request, default to 'featured'
+        $filterType = $request->get('filter', 'featured');
+    
+        // Get users who are technicians and their associated technician profiles
+        $technicians = Technician::whereHas('user', function($query) {
+                          $query->where('user_role', 'technician');
+                      })
+                      ->byHourlyRate($filterType) // Using the scope we defined in Technician model
+                      ->with('user')  // Eager load the user relationship
+                      ->paginate(10); // Add pagination with 10 items per page
+    
+        return view('page.clients.hire', compact('technicians', 'filterType'));
     }
-
-    public function hireTechnician()
-    {
-        
-         $technicians = Technician::paginate(10);
-    return view('page.clients.hire', compact('technicians'));
-    }
-
     /**
      * Show the form for creating a new resource.
      */

@@ -76,34 +76,21 @@
     </div>
     <!-- Search End -->
 
-    <!-- Technician Category Filter -->
-    <form method="GET" action="{{ route('index') }}">
-        <div class="tab-class text-center wow fadeInUp" data-wow-delay="0.3s">
-            <ul class="nav nav-pills d-inline-flex justify-content-center border-bottom mb-5">
-                <li class="nav-item">
-                    <button type="submit" name="technician_category" value="featured" class="btn btn-link"style="color:#4A628A">Featured</button>
-                </li>
-                <li class="nav-item">
-                    <button type="submit" name="technician_category" value="full_time" class="btn btn-link"style="color:#4A628A">Full Time</button>
-                </li>
-                <li class="nav-item">
-                    <button type="submit" name="technician_category" value="part_time" class="btn btn-link"style="color:#4A628A">Part Time</button>
-                </li>
-            </ul>
-        </div>
-    </form>
+ 
 
     <!-- Category Start -->
     <div class="container-xxl py-5">
         <div class="container">
             <h1 class="text-center mb-5 wow fadeInUp" data-wow-delay="0.1s">Explore By Category</h1>
+               <!-- Technician Category Filter -->
+
             <div class="row g-4">
                 @foreach($categories as $category)
                     <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.1s">
                         <a class="cat-item rounded p-4" href="category.html">
                             <i class="fa fa-3x fa-mail-bulk text-primary mb-4"></i>
                             <h6 class="mb-3">{{ $category->category_name }}</h6>
-                            <p class="mb-0">Explore this category!</p>
+                            <p class="mb-0">{{ $category->description }}</p>
                         </a>
                     </div>
                 @endforeach

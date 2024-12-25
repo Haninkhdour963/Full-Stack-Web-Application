@@ -1,52 +1,87 @@
 @extends('layouts.masterPage')
 
 @section('content')
-  <!-- Header End -->
-  <div class="container-xxl py-5 bg-dark page-header mb-5">
-            <div class="container my-5 pt-5 pb-4">
-                <h1 class="display-3 text-white mb-3 animated slideInDown">Contracts </h1>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb text-uppercase">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Pages</a></li>
-                        <li class="breadcrumb-item text-white active" aria-current="page">Sign</li>
-                    </ol>
-                </nav>
+<!-- Header End -->
+<div class="container-xxl py-5 bg-dark page-header mb-5">
+    <div class="container my-5 pt-5 pb-4">
+        <h1 class="display-3 text-white mb-3 animated slideInDown">Contracts</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb text-uppercase">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item"><a href="#">Pages</a></li>
+                <li class="breadcrumb-item text-white active" aria-current="page">Sign</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<!-- Header End -->
+
+<!-- Filter Section -->
+<div class="container mt-5">
+    <form method="GET" action="{{ route('page.clients.contract') }}">
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <label for="status" class="form-label">Job Status</label>
+                <select name="status" id="status" class="form-select">
+                    <option value="open" {{ $statusFilter == 'open' ? 'selected' : '' }}>Open</option>
+                    <option value="in_progress" {{ $statusFilter == 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                    <option value="completed" {{ $statusFilter == 'completed' ? 'selected' : '' }}>Completed</option>
+                    <option value="cancelled" {{ $statusFilter == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                    <option value="closed" {{ $statusFilter == 'closed' ? 'selected' : '' }}>Closed</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="category" class="form-label">Category</label>
+                <select name="category" id="category" class="form-select">
+                    <option value="">All Categories</option>
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}" {{ $categoryFilter == $category->id ? 'selected' : '' }}>
+                            {{ $category->category_name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
             </div>
         </div>
-        <!-- Header End -->
-    <div class="container mt-5">
-        <h2>Job Postings</h2>
-        @if ($jobPosts->isEmpty())
-            <p>No job postings found with the selected status.</p>
-        @else
-            <table class="table">
-                <thead>
+    </form>
+
+    <h2>Job Postings</h2>
+    @if ($jobPosts->isEmpty())
+        <p>No job postings found with the selected filters.</p>
+    @else
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Job Title</th>
+                    <th>Location</th>
+                    <th>Category</th>
+                    <th>Budget</th>
+                    <th>Status</th>
+                    <th>Posted At</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($jobPosts as $jobPost)
                     <tr>
-                        <th>Job Title</th>
-                        <th>Location</th>
-                        <th>Category</th>
-                        <th>Budget</th>
-                        <th>Status</th>
-                        <th>Posted At</th>
+                        <td>{{ $jobPost->title }}</td>
+                        <td>{{ $jobPost->location }}</td>
+                        <td>{{ $jobPost->category ? $jobPost->category->category_name : 'No category' }}</td>
+                        <td>${{ number_format($jobPost->budget_min, 2) }} - ${{ number_format($jobPost->budget_max, 2) }}</td>
+                        <td>{{ ucfirst($jobPost->status) }}</td>
+                        <td>
+                            {{ $jobPost->posted_at ? $jobPost->posted_at->format('M d, Y') : 'Not posted yet' }}
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach ($jobPosts as $jobPost)
-                        <tr>
-                            <td>{{ $jobPost->title }}</td>
-                            <td>{{ $jobPost->location }}</td>
-                            <td>{{ $jobPost->category ? $jobPost->category->name : 'No category' }}</td>
-                            <td>${{ number_format($jobPost->budget_min, 2) }} - ${{ number_format($jobPost->budget_max, 2) }}</td>
-                            <td>{{ ucfirst($jobPost->status) }}</td>
-                            <td>
-                                {{-- Check if posted_at is not null before calling format() --}}
-                                {{ $jobPost->posted_at ? $jobPost->posted_at->format('M d, Y') : 'Not posted yet' }}
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        @endif
-    </div>
+                @endforeach
+            </tbody>
+        </table>
+
+        <!-- Pagination Links -->
+        <div class="d-flex justify-content-center">
+            {{ $jobPosts->appends(['status' => $statusFilter, 'category' => $categoryFilter])->links('vendor.pagination.custom') }}
+        </div>
+    @endif
+</div>
 @endsection

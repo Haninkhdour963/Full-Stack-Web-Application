@@ -1,126 +1,97 @@
 @extends('layouts.masterPage')
 
-
-
 @section('content')
 
+<!-- Header Start -->
+<div class="container-xxl py-5 bg-dark page-header mb-5">
+    <div class="container my-5 pt-5 pb-4">
+        <h1 class="display-3 text-white mb-3 animated slideInDown">Bids</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb text-uppercase">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item"><a href="#">Pages</a></li>
+                <li class="breadcrumb-item text-white active" aria-current="page">Bids</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<!-- Header End -->
 
-        <!-- Header End -->
-        <div class="container-xxl py-5 bg-dark page-header mb-5">
-            <div class="container my-5 pt-5 pb-4">
-                <h1 class="display-3 text-white mb-3 animated slideInDown">Bids </h1>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb text-uppercase">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Pages</a></li>
-                        <li class="breadcrumb-item text-white active" aria-current="page">Bids</li>
-                    </ol>
-                </nav>
+<!-- Filter Form Start -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <form method="GET" action="{{ route('page.technicians.bid') }}" class="mb-4">
+            <div class="row">
+                <div class="col-md-3">
+                    <input type="text" name="location" class="form-control" placeholder="Location" value="{{ request('location') }}">
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="duration" class="form-control" placeholder="Duration" value="{{ request('duration') }}">
+                </div>
+                <div class="col-md-2">
+                    <input type="number" name="min_budget" class="form-control" placeholder="Min Budget" value="{{ request('min_budget') }}">
+                </div>
+                <div class="col-md-2">
+                    <input type="number" name="max_budget" class="form-control" placeholder="Max Budget" value="{{ request('max_budget') }}">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
             </div>
-        </div>
-        <!-- Header End -->
-          <!-- Jobs Start -->
-        <div class="container-xxl py-5">
-            <div class="container">
-                <h1 class="text-center mb-5 wow fadeInUp" data-wow-delay="0.1s">Job Postings List</h1>
-                <div class="tab-class text-center wow fadeInUp" data-wow-delay="0.3s">
-                    <ul class="nav nav-pills d-inline-flex justify-content-center border-bottom mb-5">
-                        <li class="nav-item">
-                            <a class="d-flex align-items-center text-start mx-3 ms-0 pb-3 active" data-bs-toggle="pill" href="#tab-1">
-                                <h6 class="mt-n1 mb-0">Featured</h6>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="d-flex align-items-center text-start mx-3 pb-3" data-bs-toggle="pill" href="#tab-2">
-                                <h6 class="mt-n1 mb-0">Full Time</h6>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="d-flex align-items-center text-start mx-3 me-0 pb-3" data-bs-toggle="pill" href="#tab-3">
-                                <h6 class="mt-n1 mb-0">Part Time</h6>
-                            </a>
-                        </li>
-                    </ul>
-                    <div class="tab-content">
-                        <div id="tab-1" class="tab-pane fade show p-0 active">
-                            <div class="job-item p-4 mb-4">
-                                <div class="row g-4">
-                                    <div class="col-sm-12 col-md-8 d-flex align-items-center">
-                                        <img class="flex-shrink-0 img-fluid border rounded" src="img/testimonial-2.jpg" alt="" style="width: 80px; height: 80px;">
-                                        <div class="text-start ps-4">
-                                            <h5 class="mb-3">Electrical Maintenance technician</h5>
-                                            <span class="text-truncate me-3"><i class="fa fa-map-marker-alt text-primary me-2"></i> Amman, Jordan</span>
-                                            <span class="text-truncate me-3"><i class="far fa-clock text-primary me-2"></i>Full Time</span>
-                                            <span class="text-truncate me-0"><i class="far fa-money-bill-alt text-primary me-2"></i>JOD 20 - JOD 50</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 col-md-4 d-flex flex-column align-items-start align-items-md-end justify-content-center">
-                                        <div class="d-flex mb-3">
-                                            <a class="btn btn-light btn-square me-3" href=""><i class="far fa-heart text-primary"></i></a>
-                                            <a class="btn btn-primary" href="tech-detail.php">Start A Bid</a>
-                                        </div>
-                                        <small class="text-truncate"><i class="far fa-calendar-alt text-primary me-2"></i>Date Line: 01 Jan, 2045</small>
-                                    </div>
-                                </div>
-                            </div>
-                          
-                            <a class="btn btn-primary py-3 px-5" href="">Browse More Jobs</a>
-                        </div>
-                        <div id="tab-2" class="tab-pane fade show p-0">
-                            <div class="job-item p-4 mb-4">
-                                <div class="row g-4">
-                                    <div class="col-sm-12 col-md-8 d-flex align-items-center">
-                                        <img class="flex-shrink-0 img-fluid border rounded" src="img/testimonial-2.jpg" alt="" style="width: 80px; height: 80px;">
-                                        <div class="text-start ps-4">
-                                            <h5 class="mb-3">Electrical Maintenance technician</h5>
-                                            <span class="text-truncate me-3"><i class="fa fa-map-marker-alt text-primary me-2"></i> Amman, Jordan</span>
-                                            <span class="text-truncate me-3"><i class="far fa-clock text-primary me-2"></i>Full Time</span>
-                                            <span class="text-truncate me-0"><i class="far fa-money-bill-alt text-primary me-2"></i>JOD 20 - JOD 50</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 col-md-4 d-flex flex-column align-items-start align-items-md-end justify-content-center">
-                                        <div class="d-flex mb-3">
-                                            <a class="btn btn-light btn-square me-3" href=""><i class="far fa-heart text-primary"></i></a>
-                                            <a class="btn btn-primary" href="tech-detail.php">Start A Bid</a>
-                                        </div>
-                                        <small class="text-truncate"><i class="far fa-calendar-alt text-primary me-2"></i>Date Line: 01 Jan, 2045</small>
-                                    </div>
-                                </div>
-                            </div>
-                           
-                            <a class="btn btn-primary py-3 px-5" href="">Browse More Jobs</a>
-                        </div>
-                        <div id="tab-3" class="tab-pane fade show p-0">
-                            <div class="job-item p-4 mb-4">
-                                <div class="row g-4">
-                                    <div class="col-sm-12 col-md-8 d-flex align-items-center">
-                                        <img class="flex-shrink-0 img-fluid border rounded" src="img/testimonial-2.jpg" alt="" style="width: 80px; height: 80px;">
-                                        <div class="text-start ps-4">
-                                            <h5 class="mb-3">Electrical Maintenance technician</h5>
-                                            <span class="text-truncate me-3"><i class="fa fa-map-marker-alt text-primary me-2"></i> Amman, Jordan</span>
-                                            <span class="text-truncate me-3"><i class="far fa-clock text-primary me-2"></i>Full Time</span>
-                                            <span class="text-truncate me-0"><i class="far fa-money-bill-alt text-primary me-2"></i>JOD 20 - JOD 50</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 col-md-4 d-flex flex-column align-items-start align-items-md-end justify-content-center">
-                                        <div class="d-flex mb-3">
-                                            <a class="btn btn-light btn-square me-3" href=""><i class="far fa-heart text-primary"></i></a>
-                                            <a class="btn btn-primary" href="tech-detail.php">Start A Bid</a>
-                                        </div>
-                                        <small class="text-truncate"><i class="far fa-calendar-alt text-primary me-2"></i>Date Line: 01 Jan, 2045</small>
-                                    </div>
-                                </div>
-                            </div>
-                           
-                           
-                            <a class="btn btn-primary py-3 px-5" href="technician-detail.html">Browse More Jobs</a>
-                        </div>
+        </form>
+    </div>
+</div>
+<!-- Filter Form End -->
+
+<!-- Jobs Start -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <h1 class="text-center mb-5 wow fadeInUp" data-wow-delay="0.1s">Job Postings List</h1>
+
+        <!-- Job Listings Start -->
+        @foreach($jobPostings as $job)
+        <div class="job-item p-4 mb-4">
+            <div class="row g-4">
+                <div class="col-sm-12 col-md-8 d-flex align-items-center">
+                    <img class="flex-shrink-0 img-fluid border rounded" 
+                         src="{{ asset('storage/' . ($job->client->profile_image ?? 'default.jpg')) }}" 
+                         alt="Client Profile Image" 
+                         style="width: 80px; height: 80px;">
+                    <div class="text-start ps-4">
+                        <h5 class="mb-3">{{ $job->title }}</h5>
+                        <span class="text-truncate me-3"><i class="fa fa-user text-primary me-2"></i> {{ $job->client->name }}</span>
+                        <span class="text-truncate me-3"><i class="fa fa-map-marker-alt text-primary me-2"></i> {{ $job->status }}</span>
+                        <span class="text-truncate me-3"><i class="fa fa-map-marker-alt text-primary me-2"></i> {{ $job->location }}</span>
+                        <span class="text-truncate me-3"><i class="far fa-clock text-primary me-2"></i>{{ $job->duration }}</span>
+                        <span class="text-truncate me-0"><i class="far fa-money-bill-alt text-primary me-2"></i>JOD {{ number_format($job->budget_min, 2) }} - JOD {{ number_format($job->budget_max, 2) }}</span>
                     </div>
+                </div>
+                <div class="col-sm-12 col-md-4 d-flex flex-column align-items-start align-items-md-end justify-content-center">
+                    <div class="d-flex mb-3">
+                        <a class="btn btn-light btn-square me-3" href=""><i class="far fa-heart text-primary"></i></a>
+                        <a class="btn btn-primary" href="{{ route('page.technicians.bid', $job->id) }}">Start A Bid</a>
+                    </div>
+                    <small class="text-truncate">
+                        <i class="far fa-calendar-alt text-primary me-2"></i>
+                        @if($job->created_at)
+                            {{ $job->created_at->format('d M, Y') }}
+                        @else
+                            Not Available
+                        @endif
+                    </small>
                 </div>
             </div>
         </div>
-        <!-- Jobs End -->
-    
+        @endforeach
+        <!-- Job Listings End -->
 
+        <!-- Pagination Start -->
+        <div class="d-flex justify-content-center">
+            {{ $jobPostings->links('vendor.pagination.custom') }} <!-- Display pagination links -->
+        </div>
+        <!-- Pagination End -->
+    </div>
+</div>
+<!-- Jobs End -->
 
 @endsection

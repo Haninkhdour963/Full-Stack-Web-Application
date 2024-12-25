@@ -46,19 +46,20 @@ class Technician extends Model
 
    
 
-   // Define scope to filter by hourly rate category
-   public function scopeByHourlyRate($query, $category)
-   {
-       switch ($category) {
-           case 'featured':
-               return $query->where('hourly_rate', '>', 50);  // Example threshold for "featured"
-           case 'full_time':
-               return $query->whereBetween('hourly_rate', [30, 50]);  // Example range for "full_time"
-           case 'part_time':
-               return $query->where('hourly_rate', '<', 30);  // Example threshold for "part_time"
-           default:
-               return $query;
-       }
-   }
+  // Scope in Technician model to filter by hourly rate category
+public function scopeByHourlyRate($query, $category)
+{
+    switch ($category) {
+        case 'featured':
+            return $query->where('hourly_rate', '>', 50);  // Example threshold for "featured"
+        case 'full_time':
+            return $query->whereBetween('hourly_rate', [30, 50]);  // Example range for "full_time"
+        case 'part_time':
+            return $query->where('hourly_rate', '<', 30);  // Example threshold for "part_time"
+        default:
+            return $query;
+    }
+}
+
 
 }

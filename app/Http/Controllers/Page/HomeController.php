@@ -6,29 +6,24 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\JobPosting;
 use App\Models\Review;
-use App\Models\User;
+use App\Models\Technician;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
-          // Fetch the last 3 categories (or use paginate if you want to paginate categories)
-          $categories = Category::paginate(10); // Use paginate instead of limit to enable pagination
+        // Fetch categories
+        $categories = Category::paginate(8);
 
-        
-       
+        // Fetch 10 random reviews
+        $reviews = Review::inRandomOrder()->limit(10)->get();
 
-   
-    // Fetch 10 random reviews
-    $reviews = Review::inRandomOrder()->limit(10)->get();
-        
         // Start the query for job postings
         $query = JobPosting::query();
-    
+
+
+
         // Filter by keyword if provided
         if ($request->has('keyword') && $request->get('keyword') != '') {
             $keyword = $request->get('keyword');
@@ -37,101 +32,45 @@ class HomeController extends Controller
                   ->orWhere('description', 'like', '%' . $keyword . '%');
             });
         }
-    
+        
         // Filter by category if provided
-        if ($request->has('category') && $request->get('category') != '') {
-            $categoryId = $request->get('category');
-            $query->where('category_id', $categoryId);
-        }
-    
+       if ($request->has('category') && $request->get('category') != '') {
+    $categoryId = $request->get('category');
+    $query->where('category_id', $categoryId);
+}
+
+
         // Filter by location if provided
         if ($request->has('location') && $request->get('location') != '') {
             $location = $request->get('location');
             $query->where('location', 'like', '%' . $location . '%');
         }
-    
-        // Apply technician hourly rate category filter if provided
-        if ($request->has('technician_category') && $request->get('technician_category') != '') {
-            $technicianCategory = $request->get('technician_category');
-            $query->whereHas('technicians', function ($q) use ($technicianCategory) {
-                $q->byHourlyRate($technicianCategory); // Apply the scope for hourly_rate filtering
-            });
+        
+
+        // Filter by hourly rate if provided
+        if ($request->has('hourly_rate') && $request->get('hourly_rate') != '') {
+            $hourlyRate = $request->get('hourly_rate');
+            $query->where('hourly_rate', '<=', $hourlyRate);
         }
+
+       // Apply technician category filter if provided
+if ($request->has('technician_category') && $request->get('technician_category') != '') {
+    $technicianCategory = $request->get('technician_category');
     
-        // Fetch the job postings with their related category data
-        $jobPostings = $query->with('category')->get();
+    // Get technicians filtered by category
+    $filteredTechnicians = Technician::byHourlyRate($technicianCategory)->pluck('id');
     
-        // Debugging: Log the SQL query and bindings to understand the query structure
-        $sql = $query->toSql();
-        $bindings = $query->getBindings();
-        \Log::debug("SQL Query: " . $sql);
-        \Log::debug("Bindings: " . implode(", ", $bindings));
-    
-        // Check if the query returned any results
-        if ($jobPostings->isEmpty()) {
-            \Log::debug("No job postings found.");
-        }
-    
+    // Filter job postings that have bids from these technicians
+    $query->whereHas('jobBids', function($q) use ($filteredTechnicians) {
+        $q->whereIn('technician_id', $filteredTechnicians);
+    });
+}
+
+
+        // Fetch the job postings with their related category data and paginate
+        $jobPostings = $query->with(['category', 'jobBids.technician'])->paginate(10);
+
         // Return the view with the necessary data
         return view('index', compact('jobPostings', 'categories', 'reviews'));
-    }
-    
-    
-    
-
-
-
-
-    
-  
-    
-
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

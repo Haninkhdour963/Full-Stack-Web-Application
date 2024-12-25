@@ -61,34 +61,39 @@ Route::get('/explore-by-category', [PageHomeController::class, 'exploreByCategor
 
 
 
-    
-    // About Route
-    // Route::get('/about', [PageHomeController::class, 'index'])->name('about');
-    Route::get('/about', function () {  return view('about'); })->name('about');
-   
-    
-    // Jobs Routes
-    Route::prefix('jobs')->group(function () {
-        Route::get('/technicians/bid', [PageTechnicianController::class, 'bid'])->name('page.technicians.bid');
-        Route::get('/clients/post', [PageClientController::class, 'post'])->name('page.clients.post');
-        Route::get('/clients/contract', [PageClientController::class, 'contract'])->name('page.clients.contract');
-    });
-    
-    // Client Routes
-    Route::prefix('client')->group(function () {
-        Route::get('/post', [PageClientController::class, 'createJobPost'])->name('page.clients.post');
-        Route::post('/post', [PageClientController::class, 'storeJobPost'])->name('page.clients.storeJobPost');
 
-        Route::get('/contract', [PageClientController::class, 'signContract'])->name('page.clients.contract');
-        Route::get('/hire', [PageClientController::class, 'hireTechnician'])->name('page.clients.hire');
-    });
     
-    // Technician Routes
-    Route::prefix('technician')->group(function () {
-        Route::get('/profile', [PageTechnicianController::class, 'createProfile'])->name('page.technicians.profile');
-        Route::get('/bid', [PageTechnicianController::class, 'bidOnJob'])->name('page.technicians.bid');
-        Route::get('/contract', [PageTechnicianController::class, 'manageContracts'])->name('page.technicians.contract');
-    });
+        // About Route
+        // Route::get('/about', [PageHomeController::class, 'index'])->name('about');
+        Route::get('/about', function () {  return view('about'); })->name('about');
+    
+        
+        // // Jobs Routes
+        // Route::prefix('jobs')->group(function () {
+        //     Route::get('/technicians/bid', [PageTechnicianController::class, 'bid'])->name('page.technicians.bid');
+        //     Route::get('/clients/post', [PageClientController::class, 'post'])->name('page.clients.post');
+        //     Route::get('/clients/contract', [PageClientController::class, 'contract'])->name('page.clients.contract');
+        // });
+        
+        // Client Routes
+        Route::prefix('client')->group(function () {
+            Route::get('/post', [PageClientController::class, 'createJobPost'])->name('page.clients.post');
+            Route::post('/post', [PageClientController::class, 'storeJobPost'])->name('page.clients.storeJobPost');
+            Route::get('/contract', [PageClientController::class, 'signContract'])->name('page.clients.contract');
+            Route::get('/hire', [PageClientController::class, 'hireTechnician'])->name('page.clients.hire');
+        });
+        
+        // Technician Routes
+        Route::prefix('technician')->group(function () {
+            Route::get('/profile', [PageTechnicianController::class, 'createProfile'])->name('page.technicians.profile');
+            Route::get('/bid', [PageTechnicianController::class, 'bidOnJob'])->name('page.technicians.bid');
+            Route::get('/contract', [PageTechnicianController::class, 'manageContracts'])->name('page.technicians.contract');
+        
+
+    
+        
+        
+        });
     
     // Contact Route
     Route::get('/contact', [PageContactController::class, 'index'])->name('contact');
