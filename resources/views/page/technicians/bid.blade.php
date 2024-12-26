@@ -20,25 +20,30 @@
 <!-- Filter Form Start -->
 <div class="container-xxl py-5">
     <div class="container">
-        <form method="GET" action="{{ route('page.technicians.bid') }}" class="mb-4">
-            <div class="row">
-                <div class="col-md-3">
-                    <input type="text" name="location" class="form-control" placeholder="Location" value="{{ request('location') }}">
+        <!-- Card Wrapper for Filter Form -->
+        <div class="card p-4 shadow-sm">
+            <h4 class="text-center mb-4">Filter Jobs</h4>
+            <form method="GET" action="{{ route('page.technicians.bid') }}" class="mb-4">
+                <div class="row">
+                    <div class="col-12 col-md-3 mb-3">
+                        <input type="text" name="location" class="form-control form-control-lg" placeholder="Location" value="{{ request('location') }}">
+                    </div>
+                    <div class="col-12 col-md-3 mb-3">
+                        <input type="text" name="duration" class="form-control form-control-lg" placeholder="Duration" value="{{ request('duration') }}">
+                    </div>
+                    <div class="col-12 col-md-2 mb-3">
+                        <input type="number" name="min_budget" class="form-control form-control-lg" placeholder="Min Budget" value="{{ request('min_budget') }}">
+                    </div>
+                    <div class="col-12 col-md-2 mb-3">
+                        <input type="number" name="max_budget" class="form-control form-control-lg" placeholder="Max Budget" value="{{ request('max_budget') }}">
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <button type="submit" class="btn btn-primary w-100 btn-lg">Search A Job </button>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <input type="text" name="duration" class="form-control" placeholder="Duration" value="{{ request('duration') }}">
-                </div>
-                <div class="col-md-2">
-                    <input type="number" name="min_budget" class="form-control" placeholder="Min Budget" value="{{ request('min_budget') }}">
-                </div>
-                <div class="col-md-2">
-                    <input type="number" name="max_budget" class="form-control" placeholder="Max Budget" value="{{ request('max_budget') }}">
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">Filter</button>
-                </div>
-            </div>
-        </form>
+            </form>
+        </div>
+        <!-- Card Wrapper End -->
     </div>
 </div>
 <!-- Filter Form End -->
@@ -50,9 +55,9 @@
 
         <!-- Job Listings Start -->
         @foreach($jobPostings as $job)
-        <div class="job-item p-4 mb-4">
+        <div class="job-item p-4 mb-4 shadow-sm border rounded">
             <div class="row g-4">
-                <div class="col-sm-12 col-md-8 d-flex align-items-center">
+                <div class="col-12 col-md-8 d-flex align-items-center">
                     <img class="flex-shrink-0 img-fluid border rounded" 
                          src="{{ asset('storage/' . ($job->client->profile_image ?? 'default.jpg')) }}" 
                          alt="Client Profile Image" 
@@ -66,9 +71,8 @@
                         <span class="text-truncate me-0"><i class="far fa-money-bill-alt text-primary me-2"></i>JOD {{ number_format($job->budget_min, 2) }} - JOD {{ number_format($job->budget_max, 2) }}</span>
                     </div>
                 </div>
-                <div class="col-sm-12 col-md-4 d-flex flex-column align-items-start align-items-md-end justify-content-center">
+                <div class="col-12 col-md-4 d-flex flex-column align-items-start align-items-md-end justify-content-center">
                     <div class="d-flex mb-3">
-                        <a class="btn btn-light btn-square me-3" href=""><i class="far fa-heart text-primary"></i></a>
                         <a class="btn btn-primary" href="{{ route('page.technicians.bid', $job->id) }}">Start A Bid</a>
                     </div>
                     <small class="text-truncate">

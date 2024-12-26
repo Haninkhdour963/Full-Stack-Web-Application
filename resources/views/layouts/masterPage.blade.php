@@ -23,6 +23,11 @@
     <!-- Template Javascript -->
     <script src="{{ asset('assetsPages/js/main.js') }}"></script>
 
+
+
+
+  
+
     @stack('scripts')
 </body>
 

@@ -76,18 +76,16 @@
     </div>
     <!-- Search End -->
 
- 
-
     <!-- Category Start -->
     <div class="container-xxl py-5">
         <div class="container">
             <h1 class="text-center mb-5 wow fadeInUp" data-wow-delay="0.1s">Explore By Category</h1>
-               <!-- Technician Category Filter -->
-
+            
+            <!-- Technician Category Filter -->
             <div class="row g-4">
                 @foreach($categories as $category)
                     <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.1s">
-                        <a class="cat-item rounded p-4" href="category.html">
+                        <a class="cat-item rounded p-4 d-flex flex-column" href="category.html">
                             <i class="fa fa-3x fa-mail-bulk text-primary mb-4"></i>
                             <h6 class="mb-3">{{ $category->category_name }}</h6>
                             <p class="mb-0">{{ $category->description }}</p>
@@ -119,12 +117,8 @@
                         <div class="col-6 text-end">
                             <img class="img-fluid w-100" src="{{ asset('assetsPages/img/11.gif') }}">
                         </div>
-                        <div class="col-6 text-start">
-                            <img class="img-fluid w-100" src="{{ asset('assetsPages/img/7.gif') }}">
-                        </div>
-                        <div class="col-6 text-end">
-                            <img class="img-fluid w-100" src="{{ asset('assetsPages/img/8.gif') }}">
-                        </div>
+                        
+                       
                     </div>
                 </div>
                 <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
@@ -142,32 +136,34 @@
     </div>
     <!-- About End -->
 
-    <!-- Testimonial Start -->
-    <div class="container-xxl py-5 wow fadeInUp" data-wow-delay="0.1s">
-        <div class="container">
-            <h1 class="text-center mb-5">Our Clients Say!!!</h1>
-            <div class="owl-carousel testimonial-carousel">
-                @if(isset($reviews) && $reviews->count() > 0)
-                    @foreach($reviews as $review)
-                        <div class="testimonial-item bg-light rounded p-4">
-                            <i class="fa fa-quote-left fa-2x text-primary mb-3"></i>
-                            <p>{{ $review->review_message }}</p>
-                            <div class="d-flex align-items-center">
-                                <img class="img-fluid flex-shrink-0 rounded" src="{{ asset('path_to_images/'.$review->reviewer->profile_picture) }}" style="width: 50px; height: 50px;">
-                                <div class="ps-3">
-                                    <h5 class="mb-1">{{ $review->reviewer->name }}</h5>
-                                    <small>{{ $review->job->title }}</small>
-                                </div>
+  <!-- Testimonial Start -->
+<div class="container-xxl py-5 wow fadeInUp" data-wow-delay="0.1s">
+    <div class="container">
+        <h1 class="text-center mb-5 text-white">Our Clients and Technicians Say!!!</h1>
+        <div class="owl-carousel testimonial-carousel">
+            @if(isset($reviews) && $reviews->count() > 0)
+                @foreach($reviews as $review)
+                    <div class="testimonial-item bg-light rounded p-4 text-white">
+                        <i class="fa fa-quote-left fa-2x text-primary mb-3"></i>
+                        <p>{{ $review->review_message }}</p>
+                        <div class="d-flex align-items-center">
+                            <img class="img-fluid flex-shrink-0 rounded" src="{{ asset('path_to_images/'.$review->reviewer->profile_picture) }}" style="width: 50px; height: 50px;">
+                            <div class="ps-3">
+                                <h5 class="mb-1 text-white">{{ $review->reviewer->name }}</h5>
+                                <small class="text-white">{{ $review->job->title }}</small>
                             </div>
                         </div>
-                    @endforeach
-                @else
-                    <p>No reviews available.</p>
-                @endif
-            </div>
+                    </div>
+                @endforeach
+            @else
+                <p class="text-white">No reviews available.</p>
+            @endif
         </div>
     </div>
-    <!-- Testimonial End -->
+</div>
+<!-- Testimonial End -->
+
 </div>
 
 @endsection
+

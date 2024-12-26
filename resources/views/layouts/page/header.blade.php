@@ -31,3 +31,5 @@
     <!-- Template Stylesheet -->
     <link href="{{ asset('assetsPages/css/style.css') }}" rel="stylesheet">
 </head>
+
+

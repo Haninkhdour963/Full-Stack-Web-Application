@@ -28,7 +28,7 @@
                             <div class="bg-white border rounded d-flex flex-shrink-0 align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
                                 <i class="fa fa-map-marker-alt text-primary"></i>
                             </div>
-                            <span>73 zahret elmdaen Street, Amman, Jordan</span>
+                            <span style="color:white;">73 zahret elmdaen Street, Amman, Jordan</span>
                         </div>
                     </div>
                     <div class="col-md-4 wow fadeIn" data-wow-delay="0.3s">
@@ -36,7 +36,7 @@
                             <div class="bg-white border rounded d-flex flex-shrink-0 align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
                                 <i class="fa fa-envelope-open text-primary"></i>
                             </div>
-                            <span>haneenkhdour@gmail.com</span>
+                            <span style="color:white;">haneenkhdour@gmail.com</span>
                         </div>
                     </div>
                     <div class="col-md-4 wow fadeIn" data-wow-delay="0.5s">
@@ -44,7 +44,7 @@
                             <div class="bg-white border rounded d-flex flex-shrink-0 align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
                                 <i class="fa fa-phone-alt text-primary"></i>
                             </div>
-                            <span>+962796389217</span>
+                            <span style="color:white;">+962796389217</span>
                         </div>
                     </div>
                 </div>

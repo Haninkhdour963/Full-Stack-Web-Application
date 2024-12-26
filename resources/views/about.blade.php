@@ -42,12 +42,7 @@
                                 <img class="img-fluid" src="{{asset('assetsPages/img/11.gif') }}" style="width: 100%;">
                             </div>
                          
-                            <div class="col-6 text-start">
-                                <img class="img-fluid w-100" src="{{asset('assetsPages/img/7.gif') }}"style="width: 100%;">
-                            </div>
-                            <div class="col-6 text-end">
-                                <img class="img-fluid w-100" src="{{asset('assetsPages/img/8.gif') }}"style="width: 100%;">
-                            </div>
+                           
                         </div>
                     </div>
                     <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
