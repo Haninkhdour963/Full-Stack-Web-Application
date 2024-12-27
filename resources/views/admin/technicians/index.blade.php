@@ -31,6 +31,7 @@
                                     <td>{{ $technician->rating }}</td>
                                     <td>{{ $technician->location }}</td>
                                     <td>
+                                        <button class="btn btn-info btn-sm view-btn" data-id="{{ $technician->id }}">View</button>
                                         @if($technician->deleted_at)
                                             <button class="btn btn-danger btn-sm" disabled>Deleted</button>
                                         @else
@@ -46,12 +47,17 @@
         </div>
     </div>
 </div>
+<!-- Pagination Links -->
+<div class="d-flex justify-content-center">
+    {{ $technicians->links('vendor.pagination.custom') }}
+</div>
 @endsection
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        // Soft delete button
         document.querySelectorAll('.soft-delete-btn').forEach(button => {
             button.addEventListener('click', async () => {
                 const technicianId = button.getAttribute('data-id');
@@ -92,6 +98,39 @@
                         }
                     }
                 });
+            });
+        });
+
+        // View technician button
+        document.querySelectorAll('.view-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const technicianId = button.getAttribute('data-id');
+                
+                try {
+                    const response = await fetch(`/admin/technicians/${technicianId}`);
+                    
+                    if (response.ok) {
+                        const technician = await response.json();
+                        Swal.fire({
+                            title: `Technician Details - ${technician.name}`,
+                            html: `
+                                <strong>Identity Number:</strong> ${technician.identity_number}<br>
+                                <strong>Skills:</strong> ${technician.skills}<br>
+                                <strong>Hourly Rate:</strong> $${technician.hourly_rate}<br>
+                                <strong>Rating:</strong> ${technician.rating}<br>
+                                <strong>Location:</strong> ${technician.location}<br>
+                                <strong>Bio:</strong> ${technician.bio}<br>
+                                <strong>Certifications:</strong> ${technician.certifications}<br>
+                                <strong>Available From:</strong> ${technician.available_from}<br>
+                            `,
+                            showCloseButton: true,
+                        });
+                    } else {
+                        Swal.fire('Error', 'Failed to fetch technician details.', 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Error', 'Network error. Failed to fetch technician details.', 'error');
+                }
             });
         });
     });

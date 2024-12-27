@@ -18,8 +18,8 @@ class ReviewController extends Controller
      */
     public function index()
     {
-        // Fetch all reviews, including soft-deleted ones
-        $reviews = Review::withTrashed()->get();
+        // Fetch paginated reviews, including soft-deleted ones
+    $reviews = Review::withTrashed()->paginate(10); // Paginate 10 reviews per page
         return view('admin.reviews.index', compact('reviews'));
     }
 

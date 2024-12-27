@@ -18,8 +18,8 @@ class TechnicianController extends Controller
      */
     public function index()
     {
-        // Fetch all technicians, including soft-deleted ones
-        $technicians = Technician::withTrashed()->get();
+        // Fetch technicians with pagination (10 technicians per page)
+    $technicians = Technician::withTrashed()->paginate(10);
         return view('admin.technicians.index', compact('technicians'));
     }
 
@@ -55,9 +55,23 @@ class TechnicianController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        // جلب التفاصيل الخاصة بالفني بناءً على الـ ID
+        $technician = Technician::findOrFail($id);
+        
+        // إعادة البيانات بتنسيق JSON
+        return response()->json([
+            'name' => $technician->name,  // افترض أن هناك حقل للاسم
+            'identity_number' => $technician->identity_number,
+            'skills' => $technician->skills,
+            'hourly_rate' => number_format($technician->hourly_rate, 2),
+            'rating' => $technician->rating,
+            'location' => $technician->location,
+            'bio' => $technician->bio,
+            'certifications' => $technician->certifications,
+            'available_from' => $technician->available_from,
+        ]);
     }
 
     /**

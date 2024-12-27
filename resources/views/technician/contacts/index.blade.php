@@ -42,6 +42,10 @@
         </div>
     </div>
 </div>
+  <!-- Add Pagination Links -->
+  <div class="d-flex justify-content-center">
+                        {{ $contacts->links('vendor.pagination.custom') }}
+                    </div>
 @endsection
 
 @push('scripts')

@@ -58,6 +58,6 @@
 
 <!-- Pagination Links -->
 <div class="d-flex justify-content-center">
-    {{ $payments->links() }}
+    {{ $payments->links('vendor.pagination.custom') }}
 </div>
 @endsection

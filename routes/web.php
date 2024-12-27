@@ -123,21 +123,34 @@ Route::get('/explore-by-category', [PageHomeController::class, 'exploreByCategor
             Route::resource('users', AdminUserController::class)->names('admin.users');
             Route::resource('admins', AdminAdminController::class)->names('admin.admins');
             Route::resource('technicians', AdminTechnicianController::class)->names('admin.technicians');
+            Route::get('/admin/technicians/{id}', [AdminTechnicianController::class, 'show']);
             Route::resource('categories', AdminCategoryController::class)->names('admin.categories');
             Route::resource('jobPostings', AdminJobPostingController::class)->names('admin.jobPostings');
+            Route::get('/admin/jobPostings/{id}', [AdminJobPostingController::class, 'show']);
             Route::resource('jobBids', AdminJobBidController::class)->names('admin.jobBids');
+            Route::get('/admin/jobBids/{id}', [AdminJobBidController::class, 'show']);
+
             Route::resource('escrowPayments', AdminEscrowPaymentController::class)->names('admin.escrowPayments');
+    Route::get('escrowPayments/{id}/view', [AdminEscrowPaymentController::class, 'view'])->name('escrowPayments.view');
             Route::resource('payments', AdminPaymentController::class)->names('admin.payments');
             Route::resource('reviews', AdminReviewController::class)->names('admin.reviews');
+            Route::get('reviews', [AdminReviewController::class, 'index'])->name('admin.reviews.index');
+            Route::post('reviews/{id}/softDelete', [AdminReviewController::class, 'softDelete'])->name('admin.reviews.softDelete');
+            Route::post('reviews/{id}/restore', [AdminReviewController::class, 'restore'])->name('admin.reviews.restore');
             Route::resource('disputes', AdminDisputeController::class)->names('admin.disputes');
+            
             Route::resource('contacts', AdminContactController::class)->names('admin.contacts');
+            Route::get('/contacts/{id}', [AdminContactController::class, 'show'])->name('admin.contacts.show');
             Route::resource('adminActions', AdminAdminActionController::class)->names('admin.adminActions');
+            Route::get('admin/adminActions/{id}', [AdminAdminActionController::class, 'show'])->name('admin.adminActions.show');
+
         });
 
         // Client Routes
         Route::prefix('client')->middleware('role:client')->group(function () {
             Route::get('/dashboard', [ClientDashboard::class, 'index'])->name('client.dashboard');
             Route::resource('users', ClientUserController::class)->names('client.users');
+            Route::get('users/{userId}/view-profile', [ClientUserController::class, 'viewProfile']);
             Route::resource('jobPostings', ClientJobPostingController::class)->names('client.jobPostings');
             Route::resource('payments', ClientPaymentController::class)->names('client.payments');
             Route::resource('reviews', ClientReviewController::class)->names('client.reviews');
@@ -148,12 +161,15 @@ Route::get('/explore-by-category', [PageHomeController::class, 'exploreByCategor
         Route::prefix('technician')->middleware('role:technician')->group(function () {
             Route::get('/dashboard', [TechnicianDashboard::class, 'index'])->name('technician.dashboard');
             Route::resource('technicians', TechnicianTechnicianController::class)->names('technician.technicians');
-            Route::post('technicians/{id}/soft-delete', [TechnicianTechnicianController::class, 'softDelete'])->name('technician.technicians.softDelete');
+            Route::get('/technician/technicians/{id}', [TechnicianTechnicianController::class, 'show']); // This route fetches technician details
+            Route::put('/technician/technicians/{id}', [TechnicianTechnicianController::class, 'update']);
+
             Route::resource('jobBids', TechnicianJobBidController::class)->names('technician.jobBids');
             Route::resource('escrowPayments', TechnicianEscrowPaymentController::class)->names('technician.escrowPayments');
             Route::resource('payments', TechnicianPaymentController::class)->names('technician.payments');
             Route::resource('reviews', TechnicianReviewController::class)->names('technician.reviews');
             Route::resource('contacts', TechnicianContactController::class)->names('technician.contacts');
+            
         });
 
     

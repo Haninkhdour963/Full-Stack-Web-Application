@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Technician;
 use App\Http\Controllers\Controller;
 use App\Models\Review;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReviewController extends Controller
 {
@@ -19,11 +20,19 @@ class ReviewController extends Controller
      */
     public function index()
     {
-        // Fetch all reviews, including soft-deleted ones
-        $reviews = Review::withTrashed()->get();
+        $user = Auth::user();  // Get the authenticated user (Technician)
+        
+        // Get reviews where the technician is either the reviewer or the reviewee, with pagination
+        $reviews = Review::with(['job', 'reviewer', 'reviewee'])
+                        ->where(function($query) use ($user) {
+                            $query->where('reviewer_id', $user->id)
+                                  ->orWhere('reviewee_id', $user->id);
+                        })
+                        ->paginate(8); // Adjust the number 10 to the number of reviews per page you want
+    
         return view('technician.reviews.index', compact('reviews'));
     }
-
+    
 
     /**
      * Show the form for creating a new resource.

@@ -19,10 +19,15 @@ class JobPostingController extends Controller
      */
     public function index()
     {
-        // Fetch all JobPostings with their related Category and Client (User), including soft-deleted ones
-        $jobPostings = JobPosting::with(['category', 'client'])->withTrashed()->get();
+       // Fetch all JobPostings for the currently authenticated client, including related Category and Client, and including soft-deleted ones
+    $jobPostings = JobPosting::where('client_id', auth()->id()) // Filter by the current client's ID
+    ->with(['category', 'client'])
+    ->withTrashed() // Include soft-deleted records
+    ->paginate(8); // Paginate with 10 records per pag
+        
         return view('client.jobPostings.index', compact('jobPostings'));
     }
+    
 
     /**
      * Soft delete the JobPosting.
@@ -36,6 +41,28 @@ class JobPostingController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    /**
+     * Show the specified resource details.
+     */
+    public function show(string $id)
+    {
+        $jobPosting = JobPosting::with(['category', 'client'])->findOrFail($id);
+
+        // Return the job posting as JSON for the AJAX request
+        return response()->json([
+            'title' => $jobPosting->title,
+            'description' => $jobPosting->description,
+            'category_name' => $jobPosting->category->category_name ?? 'N/A',
+            'client_name' => $jobPosting->client->name ?? 'N/A',
+            'location' => $jobPosting->location,
+            'budget_min' => $jobPosting->budget_min,
+            'budget_max' => $jobPosting->budget_max,
+            'status' => $jobPosting->status,
+            'posted_at' => $jobPosting->posted_at ? $jobPosting->posted_at->format('Y-m-d H:i:s') : 'N/A',
+        ]);
+    }
+
 
     /**
      * Show the form for creating a new resource.
@@ -56,10 +83,7 @@ class JobPostingController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        //
-    }
+ 
 
     /**
      * Show the form for editing the specified resource.

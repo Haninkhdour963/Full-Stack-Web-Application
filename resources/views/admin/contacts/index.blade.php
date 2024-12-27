@@ -46,6 +46,8 @@
                                         @else
                                             <button class="btn btn-danger btn-sm soft-delete-btn" data-id="{{ $contact->id }}">Soft Delete</button>
                                         @endif
+                                        <!-- Add View Button -->
+                                        <button class="btn btn-info btn-sm view-btn" data-id="{{ $contact->id }}">View</button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -56,95 +58,48 @@
         </div>
     </div>
 </div>
+  <!-- Add Pagination Links -->
+  <div class="d-flex justify-content-center">
+                        {{ $contacts->links('vendor.pagination.custom') }}
+                    </div>
 @endsection
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.soft-delete-btn').forEach(button => {
+        document.querySelectorAll('.view-btn').forEach(button => {
             button.addEventListener('click', async () => {
                 const contactId = button.getAttribute('data-id');
+                
+                // Fetch contact details from the server
+                try {
+                    const response = await fetch(`/admin/contacts/${contactId}`);
+                    const contact = await response.json();
 
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: 'This action will soft delete the message!',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, soft delete it!',
-                }).then(async (result) => {
-                    if (result.isConfirmed) {
-                        try {
-                            const response = await fetch(`/admin/contacts/${contactId}/soft-delete`, {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                                    'Content-Type': 'application/json',
-                                }
-                            });
-
-                            if (response.ok) {
-                                const data = await response.json();
-                                if (data.success) {
-                                    Swal.fire('Deleted!', 'Message has been soft deleted.', 'success');
-                                    const row = document.querySelector(`#contact-row-${contactId}`);
-                                    row.classList.add('text-muted');
-                                    button.disabled = true;
-                                    button.innerText = 'Deleted';
-                                } else {
-                                    Swal.fire('Error', 'Failed to delete message.', 'error');
-                                }
-                            } else {
-                                Swal.fire('Error', 'Failed to communicate with the server.', 'error');
-                            }
-                        } catch (error) {
-                            Swal.fire('Error', 'Network error. Failed to communicate with the server.', 'error');
-                        }
+                    if (contact) {
+                        // Show the contact details in the SweetAlert popup
+                        Swal.fire({
+                            title: 'Contact Details',
+                            html: `
+                                <p><strong>ID:</strong> ${contact.id}</p>
+                                <p><strong>Job Title:</strong> ${contact.job_title || 'N/A'}</p>
+                                <p><strong>Technician:</strong> ${contact.technician_name || 'N/A'}</p>
+                                <p><strong>Name:</strong> ${contact.name}</p>
+                                <p><strong>Email:</strong> ${contact.email}</p>
+                                <p><strong>Subject:</strong> ${contact.subject}</p>
+                                <p><strong>Message:</strong> ${contact.message}</p>
+                                <p><strong>Status:</strong> ${contact.status}</p>
+                            `,
+                            icon: 'info',
+                            confirmButtonText: 'Close'
+                        });
+                    } else {
+                        Swal.fire('Error', 'Failed to load contact details.', 'error');
                     }
-                });
-            });
-        });
-
-        document.querySelectorAll('.restore-btn').forEach(button => {
-            button.addEventListener('click', async () => {
-                const contactId = button.getAttribute('data-id');
-
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: 'This action will restore the soft deleted message!',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, restore it!',
-                }).then(async (result) => {
-                    if (result.isConfirmed) {
-                        try {
-                            const response = await fetch(`/admin/contacts/${contactId}/restore`, {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                                    'Content-Type': 'application/json',
-                                }
-                            });
-
-                            if (response.ok) {
-                                const data = await response.json();
-                                if (data.success) {
-                                    Swal.fire('Restored!', 'Message has been restored.', 'success');
-                                    const row = document.querySelector(`#contact-row-${contactId}`);
-                                    row.classList.remove('text-muted');
-                                    button.disabled = true;
-                                    button.innerText = 'Restored';
-                                } else {
-                                    Swal.fire('Error', 'Failed to restore message.', 'error');
-                                }
-                            } else {
-                                Swal.fire('Error', 'Failed to communicate with the server.', 'error');
-                            }
-                        } catch (error) {
-                            Swal.fire('Error', 'Network error. Failed to communicate with the server.', 'error');
-                        }
-                    }
-                });
+                } catch (error) {
+                    Swal.fire('Error', 'Failed to fetch contact details from the server.', 'error');
+                }
             });
         });
     });

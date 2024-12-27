@@ -13,13 +13,13 @@
                         <thead>
                             <tr>
                                 <th>Title</th>
-                                <th>Description</th>
+                             
                                 <th>Category</th>
                                 <th>Client</th>
                                 <th>Location</th>
-                                <th>Budget</th>
+                               
                                 <th>Status</th>
-                                <th>Posted At</th>
+                            
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -27,11 +27,11 @@
                             @foreach($jobPostings as $jobPosting)
                                 <tr id="jobPosting-row-{{ $jobPosting->id }}" class="{{ $jobPosting->deleted_at ? 'text-muted' : '' }}">
                                     <td>{{ $jobPosting->title }}</td>
-                                    <td>{{ Str::limit($jobPosting->description, 50) }}</td>
+                                    
                                     <td>{{ $jobPosting->category->category_name ?? 'N/A' }}</td>
                                     <td>{{ $jobPosting->client->name ?? 'N/A' }}</td>
                                     <td>{{ $jobPosting->location }}</td>
-                                    <td>${{ number_format($jobPosting->budget_min, 2) }} - ${{ number_format($jobPosting->budget_max, 2) }}</td>
+                                   
                                     <td>
                                         @if($jobPosting->status == 'open')
                                             <span class="badge badge-primary">Open</span>
@@ -45,8 +45,9 @@
                                             <span class="badge badge-secondary">Closed</span>
                                         @endif
                                     </td>
-                                    <td>{{ $jobPosting->posted_at ? $jobPosting->posted_at->format('Y-m-d H:i:s') : 'N/A' }}</td>
+                                    
                                     <td>
+                                        <button class="btn btn-info btn-sm view-btn" data-id="{{ $jobPosting->id }}">View</button>
                                         @if($jobPosting->deleted_at)
                                             <button class="btn btn-danger btn-sm" disabled>Deleted</button>
                                         @else
@@ -62,52 +63,70 @@
         </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="jobPostingModal" tabindex="-1" aria-labelledby="jobPostingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="jobPostingModalLabel">Job Posting Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Title:</strong> <span id="modal-title"></span></p>
+                <p><strong>Description:</strong> <span id="modal-description"></span></p>
+                <p><strong>Category:</strong> <span id="modal-category"></span></p>
+                <p><strong>Client:</strong> <span id="modal-client"></span></p>
+                <p><strong>Location:</strong> <span id="modal-location"></span></p>
+                <p><strong>Budget:</strong> <span id="modal-budget"></span></p>
+                <p><strong>Status:</strong> <span id="modal-status"></span></p>
+                <p><strong>Posted At:</strong> <span id="modal-posted_at"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+                <!-- Pagination Links -->
+<div class="d-flex justify-content-center">
+    {{ $jobPostings->links('vendor.pagination.custom') }}
+</div>
 @endsection
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.soft-delete-btn').forEach(button => {
+        document.querySelectorAll('.view-btn').forEach(button => {
             button.addEventListener('click', async () => {
                 const jobPostingId = button.getAttribute('data-id');
 
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: 'This action will soft delete the job posting!',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, soft delete it!',
-                }).then(async (result) => {
-                    if (result.isConfirmed) {
-                        try {
-                            const response = await fetch(`/admin/jobPostings/${jobPostingId}/soft-delete`, {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                                    'Content-Type': 'application/json',
-                                }
-                            });
+                try {
+                    // Fetch the job posting details from the server
+                    const response = await fetch(`/admin/jobPostings/${jobPostingId}`);
+                    const data = await response.json();
 
-                            if (response.ok) {
-                                const data = await response.json();
-                                if (data.success) {
-                                    Swal.fire('Deleted!', 'Job posting has been soft deleted.', 'success');
-                                    const row = document.querySelector(`#jobPosting-row-${jobPostingId}`);
-                                    row.classList.add('text-muted');
-                                    button.disabled = true;
-                                    button.innerText = 'Deleted';
-                                } else {
-                                    Swal.fire('Error', 'Failed to delete job posting.', 'error');
-                                }
-                            } else {
-                                Swal.fire('Error', 'Failed to communicate with the server.', 'error');
-                            }
-                        } catch (error) {
-                            Swal.fire('Error', 'Network error. Failed to communicate with the server.', 'error');
-                        }
+                    if (response.ok && data) {
+                        // Populate the modal with the fetched data
+                        document.getElementById('modal-title').innerText = data.title;
+                        document.getElementById('modal-description').innerText = data.description;
+                        document.getElementById('modal-category').innerText = data.category ? data.category.category_name : 'N/A';
+                        document.getElementById('modal-client').innerText = data.client ? data.client.name : 'N/A';
+                        document.getElementById('modal-location').innerText = data.location;
+                        document.getElementById('modal-budget').innerText = `$${data.budget_min} - $${data.budget_max}`;
+                        document.getElementById('modal-status').innerText = data.status;
+                        document.getElementById('modal-posted_at').innerText = data.posted_at ? new Date(data.posted_at).toLocaleString() : 'N/A';
+
+                        // Show the modal
+                        $('#jobPostingModal').modal('show');
+                    } else {
+                        Swal.fire('Error', 'Failed to fetch job posting details.', 'error');
                     }
-                });
+                } catch (error) {
+                    Swal.fire('Error', 'Network error. Failed to fetch job posting details.', 'error');
+                }
             });
         });
     });

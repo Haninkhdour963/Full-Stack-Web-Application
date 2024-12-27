@@ -14,9 +14,6 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Job Title</th>
-                                <th>Initiator</th>
-                                <th>Technician</th>
-                                <th>Client</th>
                                 <th>Reason</th>
                                 <th>Status</th>
                                 <th>Actions</th>
@@ -27,9 +24,6 @@
                                 <tr id="dispute-row-{{ $dispute->id }}" class="{{ $dispute->deleted_at ? 'text-muted' : '' }}">
                                     <td>{{ $dispute->id }}</td>
                                     <td>{{ $dispute->job->title ?? 'N/A' }}</td>
-                                    <td>{{ $dispute->initiator->name ?? 'N/A' }}</td>
-                                    <td>{{ $dispute->technician->name ?? 'N/A' }}</td>
-                                    <td>{{ $dispute->client->name ?? 'N/A' }}</td>
                                     <td>{{ $dispute->dispute_reason }}</td>
                                     <td>
                                         @if($dispute->deleted_at)
@@ -39,6 +33,7 @@
                                         @endif
                                     </td>
                                     <td>
+                                        <button class="btn btn-primary btn-sm view-btn" data-id="{{ $dispute->id }}">View</button>
                                         @if($dispute->deleted_at)
                                             <button class="btn btn-success btn-sm restore-btn" data-id="{{ $dispute->id }}">Restore</button>
                                         @else
@@ -54,12 +49,72 @@
         </div>
     </div>
 </div>
+
+<!-- Modal for Viewing Dispute Details -->
+<div class="modal fade" id="viewDisputeModal" tabindex="-1" aria-labelledby="viewDisputeModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewDisputeModalLabel">Dispute Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="disputeDetails">
+                    <!-- Dynamic content will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+                <!-- Pagination Links -->
+                <div class="d-flex justify-content-center">
+                    {{ $disputes->links('vendor.pagination.custom') }}  <!-- This generates the pagination links -->
+                </div>
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        // View Button Logic - Show Modal with Dispute Details
+        document.querySelectorAll('.view-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const disputeId = button.getAttribute('data-id');
+
+                try {
+                    const response = await fetch(`/admin/disputes/${disputeId}`);
+                    if (response.ok) {
+                        const dispute = await response.json();
+                        let disputeDetails = `
+                            <p><strong>ID:</strong> ${dispute.id}</p>
+                            <p><strong>Job Title:</strong> ${dispute.job ? dispute.job.title : 'N/A'}</p>
+                            <p><strong>Initiator:</strong> ${dispute.initiator ? dispute.initiator.name : 'N/A'}</p>
+                            <p><strong>Technician:</strong> ${dispute.technician ? dispute.technician.name : 'N/A'}</p>
+                            <p><strong>Client:</strong> ${dispute.client ? dispute.client.name : 'N/A'}</p>
+                            <p><strong>Reason:</strong> ${dispute.dispute_reason}</p>
+                            <p><strong>Status:</strong> ${dispute.status}</p>
+                            <p><strong>Created At:</strong> ${dispute.created_at}</p>
+                            <p><strong>Resolved At:</strong> ${dispute.resolved_at || 'N/A'}</p>
+                        `;
+
+                        document.getElementById('disputeDetails').innerHTML = disputeDetails;
+
+                        // Show the modal using Bootstrap
+                        var modal = new bootstrap.Modal(document.getElementById('viewDisputeModal'));
+                        modal.show();
+                    } else {
+                        Swal.fire('Error', 'Failed to fetch dispute details.', 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Error', 'Network error. Failed to fetch dispute details.', 'error');
+                }
+            });
+        });
+
+        // Soft Delete Button Logic
         document.querySelectorAll('.soft-delete-btn').forEach(button => {
             button.addEventListener('click', async () => {
                 const disputeId = button.getAttribute('data-id');
@@ -103,6 +158,7 @@
             });
         });
 
+        // Restore Button Logic
         document.querySelectorAll('.restore-btn').forEach(button => {
             button.addEventListener('click', async () => {
                 const disputeId = button.getAttribute('data-id');

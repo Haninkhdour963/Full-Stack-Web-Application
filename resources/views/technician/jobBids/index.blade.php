@@ -19,7 +19,7 @@
                                 <th>Bid Amount</th>
                                 <th>Status</th>
                                 <th>Bid Date</th>
-                                <th>Actions</th>
+                           
                             </tr>
                         </thead>
                         <tbody id="jobBidsTableBody">
@@ -40,13 +40,7 @@
                                         @endif
                                     </td>
                                     <td>{{ $jobBid->bid_date ? $jobBid->bid_date->format('Y-m-d H:i:s') : 'N/A' }}</td>
-                                    <td>
-                                        @if($jobBid->deleted_at)
-                                            <button class="btn btn-danger btn-sm" disabled>Deleted</button>
-                                        @else
-                                            <button class="btn btn-danger btn-sm soft-delete-btn" data-id="{{ $jobBid->id }}">Soft Delete</button>
-                                        @endif
-                                    </td>
+                                   
                                 </tr>
                             @endforeach
                         </tbody>
@@ -56,6 +50,10 @@
         </div>
     </div>
 </div>
+  <!-- Add Pagination Links -->
+  <div class="d-flex justify-content-center">
+                        {{ $jobBids->links('vendor.pagination.custom') }}
+                    </div>
 @endsection
 
 @push('scripts')

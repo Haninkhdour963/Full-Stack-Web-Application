@@ -47,6 +47,11 @@
                             @endforeach
                         </tbody>
                     </table>
+
+                    <!-- Add Pagination Links -->
+                    <div class="d-flex justify-content-center">
+                        {{ $admins->links('vendor.pagination.custom') }}
+                    </div>
                 </div>
             </div>
         </div>

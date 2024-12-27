@@ -10,7 +10,7 @@
         <!-- Users -->
         <li class="nav-item">
             <a class="nav-link" href="{{ route('client.users.index') }}">
-                <span class="menu-title">Users</span>
+                <span class="menu-title">My Profile</span>
                 <i class="mdi mdi-account-group menu-icon"></i>
             </a>
         </li>
@@ -21,13 +21,7 @@
                 <i class="mdi mdi-briefcase menu-icon"></i>
             </a>
         </li>
-        <!-- Payments -->
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('client.payments.index') }}">
-                <span class="menu-title">Payments</span>
-                <i class="mdi mdi-credit-card menu-icon"></i>
-            </a>
-        </li>
+      
         <!-- Reviews -->
         <li class="nav-item">
             <a class="nav-link" href="{{ route('client.reviews.index') }}">

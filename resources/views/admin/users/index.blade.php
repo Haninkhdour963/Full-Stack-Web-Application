@@ -16,6 +16,7 @@
                                 <th>Username</th>
                                 <th>Email</th>
                                 <th>Role</th>
+                                <th>Profile Image</th> <!-- إضافة عمود الصورة -->
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -27,9 +28,18 @@
                                     <td>{{ $user->email }}</td>
                                     <td>{{ ucfirst($user->user_role) }}</td>
                                     <td>
+                                        <!-- عرض صورة المستخدم إذا كانت موجودة -->
+                                        @if($user->profile_image)
+                                            <img src="{{ asset('storage/' . $user->profile_image) }}" alt="Profile Image" style="width: 50px; height: 50px; object-fit: cover;">
+                                        @else
+                                            <img src="{{ asset('images/default-profile-image.jpg') }}" alt="Default Profile Image" style="width: 50px; height: 50px; object-fit: cover;">
+                                        @endif
+                                    </td>
+                                    <td>
                                         @if($user->deleted_at)
                                             <button class="btn btn-danger btn-sm" disabled>Deleted</button>
                                         @else
+                                            <button class="btn btn-info btn-sm view-btn" data-id="{{ $user->id }}">View</button>
                                             <button class="btn btn-danger btn-sm soft-delete-btn" data-id="{{ $user->id }}">Delete</button>
                                         @endif
                                     </td>
@@ -42,12 +52,44 @@
         </div>
     </div>
 </div>
+
+<!-- Modal for viewing user details -->
+<div class="modal fade" id="viewUserModal" tabindex="-1" aria-labelledby="viewUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewUserModalLabel">User Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>ID:</strong> <span id="user-id"></span></p>
+                <p><strong>Name:</strong> <span id="user-name"></span></p>
+                <p><strong>Email:</strong> <span id="user-email"></span></p>
+                <p><strong>Role:</strong> <span id="user-role"></span></p>
+                <p><strong>Location:</strong> <span id="user-location"></span></p>
+                <p><strong>Phone Number:</strong> <span id="user-phone-number"></span></p>
+                <p><strong>Mobile Phone:</strong> <span id="user-mobile-phone"></span></p>
+                <p><strong>Profile Image:</strong> 
+                    <img id="user-profile-image" src="" alt="Profile Image" class="img-fluid" />
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Pagination Links -->
+<div class="d-flex justify-content-center">
+    {{ $users->links('vendor.pagination.custom') }}
+</div>
 @endsection
 
 @push('scripts')
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        // Handle soft delete button click
         document.querySelectorAll('.soft-delete-btn').forEach(button => {
             button.addEventListener('click', async () => {
                 const userId = button.getAttribute('data-id');
@@ -88,6 +130,42 @@
                         }
                     }
                 });
+            });
+        });
+
+        // Handle view button click
+        document.querySelectorAll('.view-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const userId = button.getAttribute('data-id');
+
+                try {
+                    // Fetch user details via AJAX request
+                    const response = await fetch(`/admin/users/${userId}`);
+                    if (response.ok) {
+                        const user = await response.json();  // Assuming you return user data as JSON
+
+                        // Populate the modal with user details
+                        document.getElementById('user-id').textContent = user.id;
+                        document.getElementById('user-name').textContent = user.name;
+                        document.getElementById('user-email').textContent = user.email;
+                        document.getElementById('user-role').textContent = user.user_role;
+                        document.getElementById('user-location').textContent = user.location;
+                        document.getElementById('user-phone-number').textContent = user.phone_number;
+                        document.getElementById('user-mobile-phone').textContent = user.mobile_phone;
+
+                        // Check if profile image exists and display it
+                        const profileImageUrl = user.profile_image || 'default-profile-image.jpg'; // Default if no profile image
+                        document.getElementById('user-profile-image').src = profileImageUrl;
+
+                        // Show the modal
+                        const viewModal = new bootstrap.Modal(document.getElementById('viewUserModal'));
+                        viewModal.show();
+                    } else {
+                        Swal.fire('Error', 'Failed to fetch user details.', 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Error', 'Network error. Failed to fetch user details.', 'error');
+                }
             });
         });
     });

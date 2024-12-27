@@ -19,10 +19,26 @@ class JobBidController extends Controller
      */
     public function index()
     {
-        // Fetch all JobBids with their related JobPosting and Technician (User), including soft-deleted ones
-        $jobBids = JobBid::with(['job', 'technician'])->withTrashed()->get();
-        return view('technician.jobBids.index', compact('jobBids'));
+        // Get the current authenticated user
+        $user = auth()->user();
+        
+        // Check if the user is a technician
+        if ($user->isTechnician()) {
+            // Paginate job bids for the authenticated technician (only those that belong to this technician)
+            $jobBids = JobBid::where('technician_id', $user->id)
+                             ->with(['job', 'technician'])
+                             ->withTrashed()  // Include soft-deleted records if needed
+                             ->paginate(8);  // Adjust the number per page as needed
+    
+            // Return the view with the job bids data
+            return view('technician.jobBids.index', compact('jobBids'));
+        }
+    
+        // If the user is not a technician, you could return an error or redirect
+        return redirect()->route('home')->with('error', 'Unauthorized access.');
     }
+    
+    
 
     /**
      * Soft delete the JobBid.

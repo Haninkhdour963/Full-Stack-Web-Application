@@ -17,8 +17,9 @@ class JobPostingController extends Controller
      */
     public function index()
     {
-        // Fetch all JobPostings with their related Category and Client (User), including soft-deleted ones
-        $jobPostings = JobPosting::with(['category', 'client'])->withTrashed()->get();
+       // Fetch paginated JobPostings with their related Category and Client, including soft-deleted ones
+    $jobPostings = JobPosting::with(['category', 'client'])->withTrashed()->paginate(10); // 10 items per page
+
         return view('admin.jobPostings.index', compact('jobPostings'));
     }
 
@@ -34,8 +35,6 @@ class JobPostingController extends Controller
 
         return response()->json(['success' => true]);
     }
-
-
 
     /**
      * Show the form for creating a new resource.
@@ -56,9 +55,13 @@ class JobPostingController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        // Fetch the job posting with related data
+        $jobPosting = JobPosting::with(['category', 'client'])->findOrFail($id);
+        
+        // Return the job posting data as JSON
+        return response()->json($jobPosting);
     }
 
     /**

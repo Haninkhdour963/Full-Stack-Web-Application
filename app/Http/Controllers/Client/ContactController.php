@@ -18,10 +18,13 @@ class ContactController extends Controller
      */
     public function index()
     {
-        // Fetch all contacts, including soft-deleted ones
-        $contacts = Contact::withTrashed()->get();
+         // Fetch contacts for the current authenticated client, including soft-deleted ones, with pagination
+    $contacts = Contact::withTrashed()
+    ->where('job_id', '=', auth()->user()->id)
+    ->paginate(8);
         return view('client.contacts.index', compact('contacts'));
     }
+    
 
     /**
      * Show the form for creating a new resource.

@@ -18,79 +18,77 @@ class UserController extends Controller
 
     public function index()
     {
-        
-        $users = User::withTrashed()->get(); // Get all users, including soft deleted
+        $users = User::withTrashed()->paginate(10); // Paginate with 10 users per page
         return view('admin.users.index', compact('users'));
     }
 
     public function store(Request $request)
     {
-        // Validate the input data
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:users,name',
             'email' => 'required|email|max:255|unique:users,email',
             'user_role' => 'required|in:admin,client,technician',
         ]);
     
-        // Create a new user with validated data
         $user = new User();
         $user->name = $request->input('name');
         $user->email = $request->input('email');
         $user->user_role = $request->input('user_role');
-        $user->password = bcrypt($request->input('password')); // or use a default password logic
+        $user->password = bcrypt($request->input('password'));
     
-        // Save the new user to the database
         $user->save();
     
-        // Redirect to the users list page or wherever you want
         return redirect()->route('admin.users.index')->with('success', 'User created successfully');
     }
     
-
-    public function edit(string $id)
+    public function show($id)
     {
-        $user = User::find($id);
-        if (!$user) {
-            dd('User not found'); // Debugging line to check if the user is found
-        }
-        return view('admin.users.edit', compact('user'));
+        $user = User::findOrFail($id); // Get the user by ID
+    
+        // Return user data as JSON, including the profile image URL
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'user_role' => ucfirst($user->user_role),
+            'location' => $user->location,
+            'phone_number' => $user->phone_number,
+            'mobile_phone' => $user->mobile_phone,
+            'profile_image' => asset('storage/' . $user->profile_image),  // Assuming images are stored in the 'storage' folder
+        ]);
     }
     
-    
-  // Update method
-  public function update(Request $request, $id)
-  {
-      $validated = $request->validate([
-          'name' => 'required|string|max:255',
-          'email' => 'required|email|max:255|unique:users,email,' . $id,
-          'user_role' => 'required|in:admin,client,technician',
-      ]);
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $id,
+            'profile_image' => asset('storage/' . $user->profile_image),
+        ]);
 
-      $user = User::findOrFail($id);
-      $user->name = $request->input('name');
-      $user->email = $request->input('email');
-      $user->user_role = $request->input('user_role');
-      $user->save();
+        $user = User::findOrFail($id);
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
+        $user->user_role = $request->input('user_role');
+        $user->save();
 
-      return redirect()->route('admin.users.index')->with('success', 'User updated successfully');
-  }
+        return redirect()->route('admin.users.index')->with('success', 'User updated successfully');
+    }
 
+    public function softDelete($id)
+    {
+        try {
+            $user = User::findOrFail($id);
 
-    
-  public function softDelete($id)
-  {
-      try {
-          $user = User::findOrFail($id);  // Find the user by ID
-  
-          if ($user->deleted_at) {
-              return response()->json(['error' => 'User already deleted.'], 400);
-          }
-  
-          $user->delete();  // Perform the soft delete
-  
-          return response()->json(['success' => true]);
-      } catch (\Exception $e) {
-          return response()->json(['error' => 'Failed to delete user. ' . $e->getMessage()], 500);
-      }
-  }
+            if ($user->deleted_at) {
+                return response()->json(['error' => 'User already deleted.'], 400);
+            }
+
+            $user->delete();
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete user. ' . $e->getMessage()], 500);
+        }
+    }
 }

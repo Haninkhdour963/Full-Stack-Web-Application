@@ -19,10 +19,21 @@ class ContactController extends Controller
      */
     public function index()
     {
-        // Fetch all contacts, including soft-deleted ones
-        $contacts = Contact::withTrashed()->get();
-        return view('technician.contacts.index', compact('contacts'));
+        // Fetch contacts related to the current authenticated technician
+        $technician = auth()->user(); // Get the authenticated technician (User)
+        
+        if ($technician->isTechnician()) {
+            // Paginate the contacts related to this technician (including soft-deleted ones)
+            $contacts = Contact::where('technician_id', $technician->id)
+                                ->withTrashed()
+                                ->paginate(10); // Change 10 to any number of items per page you want
+            
+            return view('technician.contacts.index', compact('contacts'));
+        }
+    
+        return redirect()->back()->with('error', 'You do not have permission to view contacts.');
     }
+    
 
     /**
      * Show the form for creating a new resource.

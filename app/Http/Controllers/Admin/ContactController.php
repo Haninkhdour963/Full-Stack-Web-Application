@@ -18,9 +18,29 @@ class ContactController extends Controller
      */
     public function index()
     {
-        // Fetch all contacts, including soft-deleted ones
-        $contacts = Contact::withTrashed()->get();
+       // Fetch all contacts, including soft-deleted ones, with pagination
+    $contacts = Contact::withTrashed()->paginate(8);
         return view('admin.contacts.index', compact('contacts'));
+    }
+
+    /**
+     * Get contact details by ID (for AJAX request).
+     */
+    public function show($id)
+    {
+        $contact = Contact::withTrashed()->findOrFail($id);
+
+        // Prepare the response data for the popup
+        return response()->json([
+            'id' => $contact->id,
+            'job_title' => $contact->job->title ?? 'N/A',
+            'technician_name' => $contact->technician->name ?? 'N/A',
+            'name' => $contact->name,
+            'email' => $contact->email,
+            'subject' => $contact->subject,
+            'message' => $contact->message,
+            'status' => $contact->deleted_at ? 'Deleted' : 'Active'
+        ]);
     }
 
     /**
@@ -48,6 +68,4 @@ class ContactController extends Controller
 
         return response()->json(['success' => true]);
     }
-
-    // Other methods like show, store, update, destroy would go here.
 }

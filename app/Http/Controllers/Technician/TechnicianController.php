@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Technician;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class TechnicianController extends Controller
 {
@@ -19,34 +20,29 @@ class TechnicianController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-{
-    // Get the currently authenticated technician
-    $technician = Auth::user();
-    
-    // Pass only the current technician's data to the view
-    return view('technician.technicians.index', compact('technician'));
-}
-
-
-    /**
-     * Soft delete the technician.
-     */
- // Soft delete a user
-
- public function softDelete($id)
-{
-    $technician = Technician::findOrFail($id);
-
-    // تحقق إذا كان قد تم حذفه بالفعل
-    if ($technician->deleted_at) {
-        return response()->json(['success' => false, 'message' => 'User already deleted.']);
+    {
+        // Get the currently authenticated technician
+        $technician = Auth::user();
+        
+        // Pass only the current technician's data to the view
+        return view('technician.technicians.index', compact('technician'));
     }
 
-    $technician->delete(); // تنفيذ الحذف الناعم
-    return response()->json(['success' => true, 'message' => 'User soft deleted successfully.']);
-}
+    /**
+     * Show the specified resource.
+     */
+    public function show($id)
+    {
+        try {
+            $technician = Technician::findOrFail($id);
+            return response()->json($technician);
+        } catch (\Exception $e) {
+            Log::error('Error fetching technician data: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch technician data'], 500);
+        }
+    }
 
-
+   
 
     /**
      * Show the form for creating a new resource.
@@ -67,10 +63,7 @@ class TechnicianController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        // Logic to show a single technician by their ID
-    }
+    
 
     /**
      * Show the form for editing the specified resource.

@@ -19,8 +19,12 @@ class ReviewController extends Controller
      */
     public function index()
     {
-        // Fetch all reviews, including soft-deleted ones
-        $reviews = Review::withTrashed()->get();
+         // Get the currently authenticated client
+    $client = auth()->user();
+
+    // Fetch all reviews made by the current client, including soft-deleted ones, and paginate them
+    $reviews = $client->reviews()->withTrashed()->paginate(8); // Paginate with 10 items per page
+
         return view('client.reviews.index', compact('reviews'));
     }
     /**

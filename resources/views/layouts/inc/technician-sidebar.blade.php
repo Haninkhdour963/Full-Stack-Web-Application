@@ -22,12 +22,12 @@
             </a>
         </li>
         <!-- Payments -->
-        <li class="nav-item">
+        <!-- <li class="nav-item">
             <a class="nav-link" href="{{ route('technician.payments.index') }}">
                 <span class="menu-title">Payments</span>
                 <i class="mdi mdi-credit-card menu-icon"></i>
             </a>
-        </li>
+        </li> -->
         <!-- Reviews -->
         <li class="nav-item">
             <a class="nav-link" href="{{ route('technician.reviews.index') }}">

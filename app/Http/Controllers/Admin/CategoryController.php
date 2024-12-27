@@ -11,8 +11,8 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        // Get all categories including soft deleted ones
-        $categories = Category::withTrashed()->get();
+        // Paginate categories, including soft deleted ones
+    $categories = Category::withTrashed()->paginate(8);  // Use paginate() instead of get()
         return view('admin.categories.index', compact('categories'));
     }
 

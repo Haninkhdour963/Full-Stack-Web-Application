@@ -12,11 +12,11 @@ class AdminActionController extends Controller
     // Index route to show list of actions
     public function index()
     {
-        // Get all admin actions, including soft-deleted ones
-        $adminActions = AdminAction::withTrashed()->get();
+       // Paginate the admin actions (10 per page, or adjust as necessary)
+    $adminActions = AdminAction::withTrashed()->paginate(8); // Change 10 to any number you prefer
 
-        // Get all users to pass to the view
-        $users = User::all();  // Fetch all users
+    // Get all users to pass to the view
+    $users = User::all();  // Fetch all users
 
         // Return the view with admin actions and users
         return view('admin.adminActions.index', compact('adminActions', 'users'));

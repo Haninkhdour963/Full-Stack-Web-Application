@@ -19,11 +19,19 @@ class EscrowPaymentController extends Controller
     public function index()
     {
         // Paginate EscrowPayments with related job and client data
-        $escrowPayments = EscrowPayment::with(['job', 'client', 'technician'])->withTrashed()->paginate(15);
+        $escrowPayments = EscrowPayment::with(['job', 'client', 'technician'])->withTrashed()->paginate(8);
     
         return view('admin.escrowPayments.index', compact('escrowPayments'));
     }
-    
+    public function view($id)
+    {
+        $escrowPayment = EscrowPayment::with(['job', 'client', 'technician'])->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'data' => $escrowPayment
+        ]);
+    }
 
      /**
      * Soft delete the EscrowPayment.

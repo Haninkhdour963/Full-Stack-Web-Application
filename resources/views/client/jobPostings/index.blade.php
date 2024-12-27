@@ -13,9 +13,6 @@
                         <thead>
                             <tr>
                                 <th>Title</th>
-                                <th>Description</th>
-                                <th>Category</th>
-                                <th>Client</th>
                                 <th>Location</th>
                                 <th>Budget</th>
                                 <th>Status</th>
@@ -27,9 +24,6 @@
                             @foreach($jobPostings as $jobPosting)
                                 <tr id="jobPosting-row-{{ $jobPosting->id }}" class="{{ $jobPosting->deleted_at ? 'text-muted' : '' }}">
                                     <td>{{ $jobPosting->title }}</td>
-                                    <td>{{ Str::limit($jobPosting->description, 50) }}</td>
-                                    <td>{{ $jobPosting->category->category_name ?? 'N/A' }}</td>
-                                    <td>{{ $jobPosting->client->name ?? 'N/A' }}</td>
                                     <td>{{ $jobPosting->location }}</td>
                                     <td>${{ number_format($jobPosting->budget_min, 2) }} - ${{ number_format($jobPosting->budget_max, 2) }}</td>
                                     <td>
@@ -47,11 +41,8 @@
                                     </td>
                                     <td>{{ $jobPosting->posted_at ? $jobPosting->posted_at->format('Y-m-d H:i:s') : 'N/A' }}</td>
                                     <td>
-                                        @if($jobPosting->deleted_at)
-                                            <button class="btn btn-danger btn-sm" disabled>Deleted</button>
-                                        @else
-                                            <button class="btn btn-danger btn-sm soft-delete-btn" data-id="{{ $jobPosting->id }}">Soft Delete</button>
-                                        @endif
+                                        <button class="btn btn-info btn-sm view-btn" data-id="{{ $jobPosting->id }}">View</button>
+                                       
                                     </td>
                                 </tr>
                             @endforeach
@@ -62,12 +53,45 @@
         </div>
     </div>
 </div>
+
+<!-- Modal to show job posting details -->
+<div class="modal fade" id="viewJobPostingModal" tabindex="-1" aria-labelledby="viewJobPostingModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewJobPostingModalLabel">Job Posting Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="jobPostingDetails">
+                    <p><strong>Title:</strong> <span id="modalJobTitle"></span></p>
+                    <p><strong>Description:</strong> <span id="modalJobDescription"></span></p>
+                    <p><strong>Category:</strong> <span id="modalJobCategory"></span></p>
+                    <p><strong>Client:</strong> <span id="modalJobClient"></span></p>
+                    <p><strong>Location:</strong> <span id="modalJobLocation"></span></p>
+                    <p><strong>Budget:</strong> <span id="modalJobBudget"></span></p>
+                    <p><strong>Status:</strong> <span id="modalJobStatus"></span></p>
+                    <p><strong>Posted At:</strong> <span id="modalJobPostedAt"></span></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <!-- Adding Close button in footer for closing the modal -->
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Pagination Links -->
+<div class="d-flex justify-content-center">
+    {{ $jobPostings->links('vendor.pagination.custom') }}
+</div>
 @endsection
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        // Soft Delete button logic (same as you have)
         document.querySelectorAll('.soft-delete-btn').forEach(button => {
             button.addEventListener('click', async () => {
                 const jobPostingId = button.getAttribute('data-id');
@@ -108,6 +132,39 @@
                         }
                     }
                 });
+            });
+        });
+
+        // View button logic
+        document.querySelectorAll('.view-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const jobPostingId = button.getAttribute('data-id');
+
+                // Fetch the details of the job posting
+                try {
+                    const response = await fetch(`/client/jobPostings/${jobPostingId}`);
+                    if (response.ok) {
+                        const jobPosting = await response.json();
+
+                        // Populate the modal with job posting data
+                        document.getElementById('modalJobTitle').innerText = jobPosting.title;
+                        document.getElementById('modalJobDescription').innerText = jobPosting.description;
+                        document.getElementById('modalJobCategory').innerText = jobPosting.category_name || 'N/A';
+                        document.getElementById('modalJobClient').innerText = jobPosting.client_name || 'N/A';
+                        document.getElementById('modalJobLocation').innerText = jobPosting.location;
+                        document.getElementById('modalJobBudget').innerText = `$${jobPosting.budget_min} - $${jobPosting.budget_max}`;
+                        document.getElementById('modalJobStatus').innerText = jobPosting.status;
+                        document.getElementById('modalJobPostedAt').innerText = jobPosting.posted_at;
+
+                        // Show the modal
+                        var myModal = new bootstrap.Modal(document.getElementById('viewJobPostingModal'));
+                        myModal.show();
+                    } else {
+                        Swal.fire('Error', 'Failed to fetch job posting details.', 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Error', 'Failed to fetch job posting details.', 'error');
+                }
             });
         });
     });

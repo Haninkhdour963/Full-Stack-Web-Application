@@ -40,6 +40,10 @@
         </div>
     </div>
 </div>
+  <!-- Pagination Links -->
+<div class="d-flex justify-content-center">
+    {{ $reviews->links('vendor.pagination.custom') }}
+</div>
 @endsection
 
 @push('scripts')

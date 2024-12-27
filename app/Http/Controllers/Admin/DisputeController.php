@@ -19,8 +19,18 @@ class DisputeController extends Controller
      */
     public function index()
     {
-        $disputes = Dispute::withTrashed()->get(); // Fetch all disputes, including soft-deleted ones
+           // Fetch disputes with pagination (10 per page, you can change this number)
+    $disputes = Dispute::withTrashed()->paginate(10); // Paginate disputes
         return view('admin.disputes.index', compact('disputes'));
+    }
+
+    /**
+     * Show the dispute details.
+     */
+    public function show($id)
+    {
+        $dispute = Dispute::withTrashed()->findOrFail($id);
+        return response()->json($dispute);
     }
 
     /**

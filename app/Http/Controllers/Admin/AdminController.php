@@ -17,8 +17,9 @@ class AdminController extends Controller
      */
     public function index()
     {
-        // Fetch all admins, including soft-deleted ones
-        $admins = Admin::withTrashed()->get();
+         // Fetch admins with pagination (10 admins per page, you can change the number as needed)
+    $admins = Admin::withTrashed()->paginate(8);
+        
         return view('admin.admins.index', compact('admins'));
     }
 

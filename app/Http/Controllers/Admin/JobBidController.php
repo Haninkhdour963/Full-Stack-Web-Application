@@ -19,8 +19,8 @@ class JobBidController extends Controller
      */
     public function index()
     {
-        // Fetch all JobBids with their related JobPosting and Technician (User), including soft-deleted ones
-        $jobBids = JobBid::with(['job', 'technician'])->withTrashed()->get();
+       // Paginate JobBids, 10 per page (you can adjust the number as needed)
+    $jobBids = JobBid::with(['job', 'technician'])->withTrashed()->paginate(10);
         return view('admin.jobBids.index', compact('jobBids'));
     }
 
@@ -35,6 +35,20 @@ class JobBidController extends Controller
         $jobBid->delete();
 
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Show the details of a specific JobBid.
+     */
+    public function show($id)
+    {
+        // Fetch the JobBid with its related Job and Technician
+        $jobBid = JobBid::with(['job', 'technician'])->findOrFail($id);
+
+        // Return the jobBid data as JSON
+        return response()->json([
+            'jobBid' => $jobBid
+        ]);
     }
 
     /**
@@ -56,11 +70,7 @@ class JobBidController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        //
-    }
-
+   
     /**
      * Show the form for editing the specified resource.
      */
