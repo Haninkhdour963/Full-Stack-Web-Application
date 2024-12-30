@@ -1,7 +1,6 @@
 @extends('layouts.masterPage')
 
 @section('content')
-
 <div class="container-xxl bg-white p-0">
     <!-- Spinner Start -->
     <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
@@ -52,7 +51,7 @@
     <div class="container-fluid bg-primary mb-5 wow fadeIn" data-wow-delay="0.1s" style="padding: 35px;">
         <div class="container">
             <div class="row g-2">
-                <form id="searchForm" method="GET" class="d-flex">
+                <form id="searchForm" method="GET" action="{{ route('index') }}" class="d-flex">
                     <div class="col-md-10 d-flex">
                         <input type="text" class="form-control border-0" name="keyword" placeholder="Keyword" value="{{ request()->get('keyword') }}" />
                         <select class="form-select border-0 mx-2" name="category">
@@ -82,7 +81,12 @@
         <div class="container">
             <h1 class="text-center mb-5 wow fadeInUp" data-wow-delay="0.1s">Explore By Category</h1>
             
-            <!-- Technician Category Filter -->
+            <!-- Results Count -->
+            <div class="mb-4" id="resultsCount">
+                <p>Found <span class="font-weight-bold">{{ $jobPostings->total() }}</span> results</p>
+            </div>
+            
+            <!-- Job Listings -->
             <div class="row g-4" id="jobListings">
                 @foreach($categories as $category)
                     <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.1s">
@@ -102,7 +106,8 @@
         </div>
     </div>
     <!-- Category End -->
-         <!-- About Start -->
+
+    <!-- About Start -->
     <div class="container-xxl py-5">
         <div class="container">
             <div class="row g-5 align-items-center">
@@ -117,8 +122,6 @@
                         <div class="col-6 text-end">
                             <img class="img-fluid w-100" src="{{ asset('assetsPages/img/11.gif') }}">
                         </div>
-                        
-                       
                     </div>
                 </div>
                 <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
@@ -136,58 +139,84 @@
     </div>
     <!-- About End -->
 
-  <!-- Testimonial Start -->
-<div class="container-xxl py-5 wow fadeInUp" data-wow-delay="0.1s">
-    <div class="container">
-        <h1 class="text-center mb-5 text-white">Our Clients and Technicians Say!!!</h1>
-        <div class="owl-carousel testimonial-carousel">
-            @if(isset($reviews) && $reviews->count() > 0)
-                @foreach($reviews as $review)
-                    <div class="testimonial-item bg-light rounded p-4 text-white">
-                        <i class="fa fa-quote-left fa-2x text-primary mb-3"></i>
-                        <p>{{ $review->review_message }}</p>
-                        <div class="d-flex align-items-center">
-                            <img class="img-fluid flex-shrink-0 rounded" src="{{ asset('path_to_images/'.$review->reviewer->profile_picture) }}" style="width: 50px; height: 50px;">
-                            <div class="ps-3">
-                                <h5 class="mb-1 text-white">{{ $review->reviewer->name }}</h5>
-                                <small class="text-white">{{ $review->job->title }}</small>
+    <!-- Testimonial Start -->
+    <div class="container-xxl py-5 wow fadeInUp" data-wow-delay="0.1s">
+        <div class="container">
+            <h1 class="text-center mb-5">Our Clients and Technicians Say!!!</h1>
+            <div class="owl-carousel testimonial-carousel">
+                @if(isset($reviews) && $reviews->count() > 0)
+                    @foreach($reviews as $review)
+                        <div class="testimonial-item bg-light rounded p-4">
+                            <i class="fa fa-quote-left fa-2x text-primary mb-3"></i>
+                            <p>{{ $review->review_message }}</p>
+                            <div class="d-flex align-items-center">
+                                <img class="img-fluid flex-shrink-0 rounded" src="{{ asset('path_to_images/'.$review->reviewer->profile_picture) }}" style="width: 50px; height: 50px;">
+                                <div class="ps-3">
+                                    <h5 class="mb-1">{{ $review->reviewer->name }}</h5>
+                                    <small>{{ $review->job->title }}</small>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                @endforeach
-            @else
-                <p class="text-white">No reviews available.</p>
-            @endif
+                    @endforeach
+                @else
+                    <p>No reviews available.</p>
+                @endif
+            </div>
         </div>
     </div>
+    <!-- Testimonial End -->
 </div>
-<!-- Testimonial End -->
-</div>
-
 @endsection
 
 @section('scripts')
 <script>
 $(document).ready(function() {
-    $('#searchForm').on('submit', function(e) {
-        e.preventDefault(); // Prevent normal form submission
-        
-        var formData = $(this).serialize(); // Serialize form data
+    // Hide spinner initially
+    $('#spinner').addClass('d-none');
 
+    // Handle form input changes (for select boxes and input fields)
+    $('#searchForm select, #searchForm input').on('change keyup', function() {
+        performSearch();
+    });
+
+    // Handle form submission
+    $('#searchForm').on('submit', function(e) {
+        e.preventDefault();
+        performSearch();
+    });
+
+    // Function to perform the AJAX search
+    function performSearch() {
+        // Show loading spinner
+        $('#spinner').removeClass('d-none').addClass('show');
+        
+        // Get form data
+        var formData = $('#searchForm').serialize();
+        
+        // Perform AJAX request
         $.ajax({
-            url: "{{ route('index') }}", // The same URL as the page (for the search to be processed)
+            url: $('#searchForm').attr('action'),
             type: 'GET',
             data: formData,
             success: function(response) {
-                // Assuming the response contains the new job listings and pagination
-                $('#jobListings').html(response.jobListings);  // Update the job listings section
-                $('#pagination').html(response.pagination);    // Update pagination links
-            },
-            error: function(xhr, status, error) {
-                console.log('Error: ' + error);
+                // Update job listings and pagination with new content
+                if (response.jobListings) {
+                    $('#jobListings').html(response.jobListings);
+                }
+                if (response.pagination) {
+                    $('#pagination').html(response.pagination);
+                }
+                // Update results count
+                if (response.count !== undefined) {
+                    $('#resultsCount p').html('Found <span class="font-weight-bold">' + response.count + '</span> results');
+                }
+                
+                // Update URL with search parameters without page refresh
+                var newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?' + formData;
+                window.history.pushState(null, '', newUrl);  // Fixed the missing function call
             }
         });
-    });
+    }
 });
 </script>
 @endsection

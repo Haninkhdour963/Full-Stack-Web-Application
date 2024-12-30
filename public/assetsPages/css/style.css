@@ -524,4 +524,12 @@
     .form-label {
         color: white;
     }
-    
+    .progress {
+        display: flex
+    ;
+        height: 1rem;
+        overflow: hidden;
+        font-size: .75rem;
+        background-color: #4A628A;
+        border-radius: 2px;
+    }

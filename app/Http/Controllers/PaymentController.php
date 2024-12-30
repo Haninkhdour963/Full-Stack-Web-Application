@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\EscrowPayment;
+use App\Models\JobBid;
 use Illuminate\Http\Request;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 
@@ -12,80 +14,64 @@ class PaymentController extends Controller
    // Function to initiate the payment
    public function payment(Request $request) {
     $provider = new PayPalClient;
-
-    // Set PayPal credentials
     $provider->setApiCredentials(config('paypal'));
 
-    // Get PayPal access token
-    $paypalToken = $provider->getAccessToken();
-
-    // Prepare PayPal order data
     $response = $provider->createOrder([
         "intent" => "CAPTURE",
-        "application_context" => [
-            "return_url" => route('success'),  // Success URL
-            "cancel_url" => route('cancel')   // Cancel URL
-        ],
-        "purchase_units" => [
-            [
-                "amount" => [
-                    "currency_code" => "USD",
-                    "value" => $request->price  // Pass price dynamically
-                ]
+        "purchase_units" => [[
+            "amount" => [
+                "currency_code" => "USD",
+                "value" => $request->price
             ]
-        ]
+        ]]
     ]);
-    
 
-    // Check if PayPal response contains the order ID
-    if (isset($response['id']) && $response['id'] != null) {
-        // Find the approval URL from PayPal response
-        foreach ($response['links'] as $link) {
-            if ($link['rel'] === 'approve') {
-                return redirect()->away($link['href']);  // Redirect to PayPal approval page
-            }
+    if(isset($response['id'])) {
+        return response()->json(['id' => $response['id']]);
+    }
+
+    return response()->json(['error' => 'Failed to create order'], 500);
+}
+
+public function success(Request $request)
+{
+    $paymentData = $request->input('paymentDetails');
+    $orderID = $request->input('orderID');
+
+    // Create escrow payment record
+    $payment = EscrowPayment::create([
+        'transaction_id' => $orderID,
+        'job_bid_id' => session('bid_id'),
+        'amount' => $paymentData['purchase_units'][0]['amount']['value'],
+        'status' => 'completed',
+        'payment_method' => 'paypal'
+    ]);
+
+    if ($payment) {
+        // Update job bid status
+        $jobBid = JobBid::find($payment->job_bid_id);
+        if ($jobBid) {
+            $jobBid->status = 'accepted';
+            $jobBid->save();
+
+            // Update job posting status
+            $jobBid->jobPosting->status = 'completed';
+            $jobBid->jobPosting->save();
         }
     }
 
-    // If response doesn't contain the order ID, return an error
-    return redirect()->route('page.technicians.form')->with('error', 'Error initiating payment. Please try again.');
+    session(['current_step' => 4]); // Move to the payment success step
+    return redirect()->route('page.technicians.form')->with('success', 'Payment processed successfully!');
 }
 
-// Function to handle successful payment
-public function success(Request $request) {
-    $provider = new PayPalClient;
 
-    // Set PayPal credentials
-    $provider->setApiCredentials(config('paypal'));
-
-    // Get the access token
-    $paypalToken = $provider->getAccessToken();
-
-    // Capture the payment using the token received from PayPal
-    $response = $provider->capturePaymentOrder($request->token);
-
-    // Check if the payment was successfully captured
-    if (isset($response['status']) && $response['status'] == 'COMPLETED') {
-        // Payment was successful, proceed with any necessary actions
-        // Example: updating the database or setting a session variable
-        session(['current_step' => 4]);
-
-        // Redirect to the 'bid' page with success message
-        return redirect()->route('page.technicians.bid')->with('success', 'Payment successful! You can now proceed with bidding.');
-    } else {
-        // If payment failed, return an error
-        return redirect()->route('page.technicians.form')->with('error', 'Payment failed. Please try again.');
-    }
-}
-
-// Function to handle payment cancellation
-public function cancel(Request $request) {
-    // Handle cancel payment scenario
+public function cancel(Request $request)
+{
     return redirect()->route('page.technicians.form')->with('error', 'Payment was canceled.');
 }
 
-// Show PayPal page (route where users are directed to initiate PayPal payments)
-public function showPaypalPage() {
-    return view('payment');  // Display a page for initiating PayPal payments
+public function showPaypalPage()
+{
+    return view('payment');
 }
 }

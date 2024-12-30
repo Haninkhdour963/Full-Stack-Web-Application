@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\EscrowPayment;
 use App\Models\JobBid;
 use App\Models\JobPosting;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth; 
 use PayPal\Api\Payer;
 use PayPal\Api\Amount;
 use PayPal\Api\Transaction;
@@ -27,25 +29,36 @@ class TechnicianController extends Controller
     // This function shows the form with the correct step.
     public function showForm($jobId = null)
     {
-        // Get job ID from session if not provided
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Please login to place a bid.');
+        }
+
         $jobId = $jobId ?? session('job_id');
-        
-        // Get job details
         $job = null;
+        
         if ($jobId) {
             $job = JobPosting::with('client')->findOrFail($jobId);
+            
+            // Check if user is a technician
+            if (auth()->user()->user_role !== 'technician') {
+                return redirect()->back()->with('error', 'Only technicians can place bids.');
+            }
+
+            // Check if user is not the job owner
+            if (auth()->id() === $job->client_id) {
+                return redirect()->back()->with('error', 'You cannot bid on your own job posting.');
+            }
+
             session(['job_id' => $jobId]);
         }
 
-        // Get current step
         $currentStep = session('current_step', 1);
-
-        // Get existing bid data if technician has already placed a bid
         $existingBid = null;
+        
         if ($jobId && auth()->check()) {
             $existingBid = JobBid::where('job_id', $jobId)
-                                 ->where('technician_id', auth()->id())
-                                 ->first();
+                                ->where('technician_id', auth()->id())
+                                ->first();
         }
 
         return view('page.technicians.form', compact('job', 'currentStep', 'existingBid'));
@@ -53,94 +66,78 @@ class TechnicianController extends Controller
 
     public function submitBid(Request $request)
     {
-        // Ensure the technician is authenticated
-        if (!auth()->check()) {
-            return redirect()->route('login')->with('error', 'You must be logged in to submit a bid.');
+        if (!Auth::check() || Auth::user()->user_role !== 'technician') {
+            return redirect()->route('login')->with('error', 'Only technicians can submit bids.');
         }
-    
-        // Validate incoming request
+
         $validated = $request->validate([
             'job_id' => 'required|exists:job_postings,id',
             'bid_amount' => 'required|numeric|min:1',
             'bid_message' => 'nullable|string',
         ]);
-    
-        $technicianId = auth()->id();
-    
+
+        $job = JobPosting::findOrFail($validated['job_id']);
+        
         // Create or update the bid
-        $existingBid = JobBid::updateOrCreate(
+        $bid = JobBid::updateOrCreate(
             [
                 'job_id' => $validated['job_id'],
-                'technician_id' => $technicianId,
+                'technician_id' => Auth::id(),
             ],
             [
                 'bid_amount' => $validated['bid_amount'],
                 'bid_message' => $validated['bid_message'],
+                'status' => 'pending'
             ]
         );
-    
-        // Update session and proceed to the next step (Bid Confirmation)
-        session(['current_step' => 2, 'job_title' => $existingBid->job->title, 'bid_id' => $existingBid->id]);
-    
-        // Redirect to the form for confirmation
+
+        // Update job posting status
+        $job->update(['status' => 'in_progress']);
+
+        session(['current_step' => 2, 'job_title' => $job->title, 'bid_id' => $bid->id]);
         return redirect()->route('page.technicians.form');
     }
     
 
 
     // Accept contract functionality
-    public function acceptContract(Request $request)
-    {
-        // Your logic to accept the contract
-        // For now, we just proceed to the next step
-        session(['current_step' => 3]);
+   // Accept contract functionality
+public function acceptContract(Request $request)
+{
+    if (!Auth::check()) {
+        return redirect()->route('login');
+    }
 
+    $bidId = session('bid_id');
+    $bid = JobBid::findOrFail($bidId);
+
+    // Ensure only the client who owns the job can accept the bid
+    if (Auth::user()->user_role === 'client' && Auth::id() === $bid->job->client_id) {
+        $bid->update(['status' => 'accepted']);
+        session(['current_step' => 3]); // Proceed to payment step
         return redirect()->route('page.technicians.form');
     }
 
-    public function processPayment(Request $request)
-    {
-        // Example data, you may replace with actual logic
-        $bid_id = $request->bid_id;
+    return redirect()->back()->with('error', 'Only the client can accept the bid.');
+}
 
-        // Set up the payment details (mock data for this example)
-        $payer = new Payer();
-        $payer->setPaymentMethod("peyapal");
 
-        $amount = new Amount();
-        $amount->setCurrency("JOD")
-            ->setTotal(100.00);  // Replace with the actual amount
-
-        $transaction = new Transaction();
-        $transaction->setAmount($amount)
-            ->setDescription("Bid payment for job");
-
-        $redirectUrls = new RedirectUrls();
-        $redirectUrls->setReturnUrl(route('success'))  // Define success URL
-            ->setCancelUrl(route('cancel'));  // Define cancel URL
-
-        $payment = new Payment();
-        $payment->setIntent("sale")
-            ->setPayer($payer)
-            ->setTransactions([$transaction])
-            ->setRedirectUrls($redirectUrls);
-
-        try {
-            $payment->create($this->apiContext);
-
-            // Return the approval URL
-            return response()->json([
-                'success' => true,
-                'approval_url' => $payment->getApprovalLink()
-            ]);
-        } catch (\Exception $ex) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error creating PayPal payment: ' . $ex->getMessage()
-            ]);
-        }
-    }
     
+    public function paymentSuccess(Request $request)
+    {
+        $bid = JobBid::findOrFail(session('bid_id'));
+        
+        // Update job status
+        $bid->job->update(['status' => 'completed']);
+        
+        // Update escrow payment status
+        EscrowPayment::where('job_id', $bid->job_id)
+                     ->where('status', 'hold')
+                     ->update(['status' => 'released']);
+
+        session(['current_step' => 4]);
+        return redirect()->route('page.technicians.form')->with('success', 'Payment processed successfully!');
+    }
 
 
 

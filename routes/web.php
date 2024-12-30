@@ -50,31 +50,21 @@
     */
 
   
-
+    Route::post('/technician/respond-to-bid', [PageTechnicianController::class, 'respondToBid'])
+    ->name('technician.respondToBid')
+    ->middleware(['auth', 'role:client']);
     // Home Route
     Route::get('/', [PageHomeController::class, 'index'])->name('index');
 
 Route::get('/filter-by-location', [PageHomeController::class, 'filterByLocation']);
 Route::get('/explore-by-category', [PageHomeController::class, 'exploreByCategory']);
 
-
-
-
-
-
     
         // About Route
         // Route::get('/about', [PageHomeController::class, 'index'])->name('about');
         Route::get('/about', function () {  return view('about'); })->name('about');
     
-        
-        // // Jobs Routes
-        // Route::prefix('jobs')->group(function () {
-        //     Route::get('/technicians/bid', [PageTechnicianController::class, 'bid'])->name('page.technicians.bid');
-        //     Route::get('/clients/post', [PageClientController::class, 'post'])->name('page.clients.post');
-        //     Route::get('/clients/contract', [PageClientController::class, 'contract'])->name('page.clients.contract');
-        // });
-        
+       
         // Client Routes
         Route::prefix('client')->group(function () {
             Route::get('/post', [PageClientController::class, 'createJobPost'])->name('page.clients.post');
@@ -97,6 +87,11 @@ Route::get('/explore-by-category', [PageHomeController::class, 'exploreByCategor
     Route::get('/contract', [PageTechnicianController::class, 'manageContracts'])->name('page.technicians.contract');
 
         });
+
+     
+        
+        Route::post('/payment/success', [PaymentController::class, 'success'])
+            ->name('payment.success');
     
     // Contact Route
     Route::get('/contact', [PageContactController::class, 'index'])->name('contact');

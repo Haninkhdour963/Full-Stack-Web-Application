@@ -72,6 +72,7 @@ class HomeController extends Controller
             return response()->json([
                 'jobListings' => $view,
                 'pagination' => $pagination,
+                'count' => $jobPostings->total()
             ]);
         }
 
