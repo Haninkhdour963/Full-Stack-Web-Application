@@ -15,6 +15,53 @@ class ContactController extends Controller
         return view('contact');
     }
 
+    public function showForm()
+    {
+        return view('bid_flow.step1');
+    }
+
+    public function step1(Request $request)
+    {
+        $request->validate([
+            'bidAmount' => 'required|numeric',
+            'bidMessage' => 'required|string',
+        ]);
+
+        session([
+            'bidAmount' => $request->bidAmount,
+            'bidMessage' => $request->bidMessage,
+        ]);
+
+        return redirect()->route('bidFlow.step2');
+    }
+
+    public function step2(Request $request)
+    {
+        return view('bid_flow.step2');
+    }
+
+    public function step3(Request $request)
+    {
+        $request->validate([
+            'paymentMethod' => 'required|string',
+        ]);
+
+        session([
+            'paymentMethod' => $request->paymentMethod,
+        ]);
+
+        return redirect()->route('bidFlow.confirmation');
+    }
+
+    public function confirmation()
+    {
+        $bidAmount = session('bidAmount');
+        $paymentMethod = session('paymentMethod');
+
+        return view('bid_flow.confirmation', compact('bidAmount', 'paymentMethod'));
+    }
+
+
     /**
      * Show the form for creating a new resource.
      */

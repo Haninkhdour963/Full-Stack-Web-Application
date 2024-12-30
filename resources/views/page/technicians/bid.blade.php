@@ -76,7 +76,7 @@
                 </div>
                 <div class="col-12 col-md-4 d-flex flex-column align-items-start align-items-md-end justify-content-center">
                     <div class="d-flex mb-3">
-                        <a class="btn btn-primary" href="{{ route('page.technicians.bid', $job->id) }}">Start A Bid</a>
+                    <a class="btn btn-primary" href="{{ route('page.technicians.form', ['jobId' => $job->id]) }}">Start A Bid</a>
                     </div>
                     <small class="text-truncate">
                         <i class="far fa-calendar-alt text-primary me-2"></i>

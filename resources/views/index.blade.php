@@ -1,4 +1,5 @@
 @extends('layouts.masterPage')
+
 @section('content')
 
 <div class="container-xxl bg-white p-0">
@@ -51,7 +52,7 @@
     <div class="container-fluid bg-primary mb-5 wow fadeIn" data-wow-delay="0.1s" style="padding: 35px;">
         <div class="container">
             <div class="row g-2">
-                <form method="GET" action="{{ route('index') }}" class="d-flex">
+                <form id="searchForm" method="GET" class="d-flex">
                     <div class="col-md-10 d-flex">
                         <input type="text" class="form-control border-0" name="keyword" placeholder="Keyword" value="{{ request()->get('keyword') }}" />
                         <select class="form-select border-0 mx-2" name="category">
@@ -82,10 +83,10 @@
             <h1 class="text-center mb-5 wow fadeInUp" data-wow-delay="0.1s">Explore By Category</h1>
             
             <!-- Technician Category Filter -->
-            <div class="row g-4">
+            <div class="row g-4" id="jobListings">
                 @foreach($categories as $category)
                     <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.1s">
-                        <a class="cat-item rounded p-4 d-flex flex-column" href="category.html">
+                        <a class="cat-item rounded p-4 d-flex flex-column" href="{{ route('page.technicians.bid') }}">
                             <i class="fa fa-3x fa-mail-bulk text-primary mb-4"></i>
                             <h6 class="mb-3">{{ $category->category_name }}</h6>
                             <p class="mb-0">{{ $category->description }}</p>
@@ -95,14 +96,13 @@
             </div>
 
             <!-- Pagination Links -->
-            <div class="d-flex justify-content-center mt-4">
+            <div class="d-flex justify-content-center mt-4" id="pagination">
                 {{ $categories->links('vendor.pagination.custom') }}
             </div>
         </div>
     </div>
     <!-- Category End -->
-
-    <!-- About Start -->
+         <!-- About Start -->
     <div class="container-xxl py-5">
         <div class="container">
             <div class="row g-5 align-items-center">
@@ -162,8 +162,32 @@
     </div>
 </div>
 <!-- Testimonial End -->
-
 </div>
 
 @endsection
 
+@section('scripts')
+<script>
+$(document).ready(function() {
+    $('#searchForm').on('submit', function(e) {
+        e.preventDefault(); // Prevent normal form submission
+        
+        var formData = $(this).serialize(); // Serialize form data
+
+        $.ajax({
+            url: "{{ route('index') }}", // The same URL as the page (for the search to be processed)
+            type: 'GET',
+            data: formData,
+            success: function(response) {
+                // Assuming the response contains the new job listings and pagination
+                $('#jobListings').html(response.jobListings);  // Update the job listings section
+                $('#pagination').html(response.pagination);    // Update pagination links
+            },
+            error: function(xhr, status, error) {
+                console.log('Error: ' + error);
+            }
+        });
+    });
+});
+</script>
+@endsection

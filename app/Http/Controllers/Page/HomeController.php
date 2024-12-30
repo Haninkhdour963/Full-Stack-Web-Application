@@ -13,7 +13,7 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
-        // Fetch categories
+        // Fetch categories for the search filter
         $categories = Category::paginate(8);
 
         // Fetch 10 random reviews
@@ -21,8 +21,6 @@ class HomeController extends Controller
 
         // Start the query for job postings
         $query = JobPosting::query();
-
-
 
         // Filter by keyword if provided
         if ($request->has('keyword') && $request->get('keyword') != '') {
@@ -34,18 +32,16 @@ class HomeController extends Controller
         }
         
         // Filter by category if provided
-       if ($request->has('category') && $request->get('category') != '') {
-    $categoryId = $request->get('category');
-    $query->where('category_id', $categoryId);
-}
-
+        if ($request->has('category') && $request->get('category') != '') {
+            $categoryId = $request->get('category');
+            $query->where('category_id', $categoryId);
+        }
 
         // Filter by location if provided
         if ($request->has('location') && $request->get('location') != '') {
             $location = $request->get('location');
             $query->where('location', 'like', '%' . $location . '%');
         }
-        
 
         // Filter by hourly rate if provided
         if ($request->has('hourly_rate') && $request->get('hourly_rate') != '') {
@@ -53,24 +49,33 @@ class HomeController extends Controller
             $query->where('hourly_rate', '<=', $hourlyRate);
         }
 
-       // Apply technician category filter if provided
-if ($request->has('technician_category') && $request->get('technician_category') != '') {
-    $technicianCategory = $request->get('technician_category');
-    
-    // Get technicians filtered by category
-    $filteredTechnicians = Technician::byHourlyRate($technicianCategory)->pluck('id');
-    
-    // Filter job postings that have bids from these technicians
-    $query->whereHas('jobBids', function($q) use ($filteredTechnicians) {
-        $q->whereIn('technician_id', $filteredTechnicians);
-    });
-}
-
+        // Apply technician category filter if provided
+        if ($request->has('technician_category') && $request->get('technician_category') != '') {
+            $technicianCategory = $request->get('technician_category');
+            
+            // Get technicians filtered by category
+            $filteredTechnicians = Technician::byHourlyRate($technicianCategory)->pluck('id');
+            
+            // Filter job postings that have bids from these technicians
+            $query->whereHas('jobBids', function($q) use ($filteredTechnicians) {
+                $q->whereIn('technician_id', $filteredTechnicians);
+            });
+        }
 
         // Fetch the job postings with their related category data and paginate
         $jobPostings = $query->with(['category', 'jobBids.technician'])->paginate(10);
 
-        // Return the view with the necessary data
+        // If the request is an AJAX request, return only the job listings and pagination
+        if ($request->ajax()) {
+            $view = view('partials.job_listings', compact('jobPostings'))->render();
+            $pagination = view('vendor.pagination.custom', compact('jobPostings'))->render();
+            return response()->json([
+                'jobListings' => $view,
+                'pagination' => $pagination,
+            ]);
+        }
+
+        // Otherwise, return the full page view
         return view('index', compact('jobPostings', 'categories', 'reviews'));
     }
 }

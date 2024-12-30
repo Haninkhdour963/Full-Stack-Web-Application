@@ -87,18 +87,26 @@ Route::get('/explore-by-category', [PageHomeController::class, 'exploreByCategor
         Route::prefix('technician')->group(function () {
             Route::get('/profile', [PageTechnicianController::class, 'createProfile'])->name('page.technicians.profile');
             Route::get('/bid', [PageTechnicianController::class, 'bidOnJob'])->name('page.technicians.bid');
-            Route::get('/contract', [PageTechnicianController::class, 'manageContracts'])->name('page.technicians.contract');
-        
+          
+    Route::get('/form/{jobId?}', [PageTechnicianController::class, 'showForm'])->name('page.technicians.form');
+    Route::post('/submitbid', [PageTechnicianController::class, 'submitBid'])->name('page.technicians.submitBid');
+    Route::post('/accept-contract', [PageTechnicianController::class, 'acceptContract'])->name('page.technicians.acceptContract');
+    Route::post('/process-payment', [PageTechnicianController::class, 'processPayment'])->name('page.technicians.processPayment');
+    Route::get('/reset-flow', [PageTechnicianController::class, 'resetBidFlow'])->name('page.technicians.resetFlow');      
+ 
+    Route::get('/contract', [PageTechnicianController::class, 'manageContracts'])->name('page.technicians.contract');
 
-    
-        
-        
         });
     
     // Contact Route
     Route::get('/contact', [PageContactController::class, 'index'])->name('contact');
   
-    Route::get('/payment', [PaymentController::class, 'index'])->name('Payment');
+Route::get('/payment', [PaymentController::class, 'index'])->name('Payment');
+
+ Route::get('payment', [PaymentController::class, 'showPaypalPage']);
+Route::post('payment', [PaymentController::class, 'payment'])->name('payment');
+Route::get('success', [PaymentController::class, 'success'])->name('success');
+Route::get('cancel', [PaymentController::class, 'cancel'])->name('cancel');
     
     
 
