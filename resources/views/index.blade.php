@@ -22,8 +22,8 @@
                             <div class="col-10 col-lg-8">
                                 <h1 class="display-3 text-white animated slideInDown mb-4">Find The Perfect Customer That You Deserved</h1>
                                 <p class="fs-5 fw-medium text-white mb-4 pb-2">Together, we can enhance the efficiency of service delivery in the labor market.</p>
-                                <a href="" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Search A Services</a>
-                                <a href="" class="btn btn-secondary py-md-3 px-md-5 animated slideInRight">Find A Technician</a>
+                                <a href="{{ route('page.technicians.bid') }}" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Search A Services</a>
+                                <a href="{{ route('page.clients.hire') }}" class="btn btn-secondary py-md-3 px-md-5 animated slideInRight">Find A Technician</a>
                             </div>
                         </div>
                     </div>
@@ -37,8 +37,8 @@
                             <div class="col-10 col-lg-8">
                                 <h1 class="display-3 text-white animated slideInDown mb-4">Find The Best Technician That Fit You</h1>
                                 <p class="fs-5 fw-medium text-white mb-4 pb-2">Together, we can enhance the efficiency of service delivery in the labor market.</p>
-                                <a href="" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Start A Bid</a>
-                                <a href="" class="btn btn-secondary py-md-3 px-md-5 animated slideInRight">Find A Technician</a>
+                                <a href="{{ route('page.technicians.bid') }}" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Start A Bid</a>
+                                <a href="{{ route('page.clients.hire') }}" class="btn btn-secondary py-md-3 px-md-5 animated slideInRight">Find A Technician</a>
                             </div>
                         </div>
                     </div>

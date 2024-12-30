@@ -4,16 +4,17 @@
                 <div class="row g-5">
                     <div class="col-lg-3 col-md-6">
                         <h5 class="text-white mb-4">Company</h5>
-                        <a class="btn btn-link text-white-50" href="{{ route('about') }}">About Us</a>
-                        <a class="btn btn-link text-white-50" href="category.html">Categories</a>
-                        <a class="btn btn-link text-white-50" href="technician-list.html">Technician Listing</a>
+                       
+                        <a class="btn btn-link text-white-50" href="{{ route('index') }}">Categories</a>
+                        <a class="btn btn-link text-white-50" href="{{ route('page.technicians.bid') }}">Technician Listing</a>
+                        <a class="btn btn-link text-white-50" href="{{ route('page.clients.hire') }}">Hire Technician</a>
                        
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <h5 class="text-white mb-4">Quick Links</h5>
                         <a class="btn btn-link text-white-50" href="{{ route('about') }}">About Us</a>
                      
-                        <a class="btn btn-link text-white-50" href="signup.html">SignUp</a>
+                        <a class="btn btn-link text-white-50" href="{{ route('login') }}">SignUp</a>
                        
                     </div>
                     <div class="col-lg-3 col-md-6">
@@ -48,8 +49,8 @@
                         <div class="col-md-6 text-center text-md-end">
                             <div class="footer-menu">
                                 <a href="{{ route('index') }}">Home</a>
-                                <a href="index.html">Help</a>
-                                <a href="contact.html">FQAs</a>
+                                <a href="{{ route('index') }}">Help</a>
+                                <a href="{{ route('contact') }}">FQAs</a>
                             </div>
                         </div>
                     </div>
