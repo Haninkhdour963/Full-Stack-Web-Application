@@ -138,33 +138,33 @@
         </div>
     </div>
     <!-- About End -->
-
-    <!-- Testimonial Start -->
-    <div class="container-xxl py-5 wow fadeInUp" data-wow-delay="0.1s">
-        <div class="container">
-            <h1 class="text-center mb-5">Our Clients and Technicians Say!!!</h1>
-            <div class="owl-carousel testimonial-carousel">
-                @if(isset($reviews) && $reviews->count() > 0)
-                    @foreach($reviews as $review)
-                        <div class="testimonial-item bg-light rounded p-4">
-                            <i class="fa fa-quote-left fa-2x text-primary mb-3"></i>
-                            <p>{{ $review->review_message }}</p>
-                            <div class="d-flex align-items-center">
-                                <img class="img-fluid flex-shrink-0 rounded" src="{{ asset('path_to_images/'.$review->reviewer->profile_picture) }}" style="width: 50px; height: 50px;">
-                                <div class="ps-3">
-                                    <h5 class="mb-1">{{ $review->reviewer->name }}</h5>
-                                    <small>{{ $review->job->title }}</small>
-                                </div>
+<!-- Testimonial Start -->
+<div class="container-xxl py-5 wow fadeInUp" data-wow-delay="0.1s">
+    <div class="container">
+        <h1 class="text-center mb-5">Our Clients and Technicians Say!!!</h1>
+        <div class="owl-carousel testimonial-carousel">
+            @if(isset($reviews) && $reviews->count() > 0)
+                @foreach($reviews as $review)
+                    <div class="testimonial-item bg-light rounded p-4">
+                        <i class="fa fa-quote-left fa-2x text-primary mb-3"></i>
+                        <p>{{ $review->review_message }}</p>
+                        <div class="d-flex align-items-center justify-content-center">
+                            <!-- <img class="img-fluid flex-shrink-0 rounded" src="{{ asset('path_to_images/'.$review->reviewer->profile_picture) }}" style="width: 50px; height: 50px;"> -->
+                            <div class="ps-3 text-center">
+                                <h5 class="mb-1">{{ $review->reviewer->name }}</h5>
+                                <small>{{ $review->job->title }}</small>
                             </div>
                         </div>
-                    @endforeach
-                @else
-                    <p>No reviews available.</p>
-                @endif
-            </div>
+                    </div>
+                @endforeach
+            @else
+                <p>No reviews available.</p>
+            @endif
         </div>
     </div>
-    <!-- Testimonial End -->
+</div>
+<!-- Testimonial End -->
+
 </div>
 @endsection
 

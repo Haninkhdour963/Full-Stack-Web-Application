@@ -24,6 +24,7 @@ class TechnicianController extends Controller
     public function index()
     {
         return view('page.technicians.profile');
+       
     }
    
     // This function shows the form with the correct step.
@@ -161,7 +162,8 @@ public function acceptContract(Request $request)
 
     
     public function createProfile(){
-        return view('page.technicians.profile');
+        // return view('page.technicians.profile');
+        return redirect()->route('login')->with('error', 'You need to register as a technician to create a profile.');
         
     }
  
@@ -237,6 +239,15 @@ public function acceptContract(Request $request)
 
     
    
+
+
+
+
+
+
+
+
+
     /**
      * Show the form for creating a new resource.
      */

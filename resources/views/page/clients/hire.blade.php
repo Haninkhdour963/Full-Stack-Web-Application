@@ -76,7 +76,7 @@
                                         <div class="col-sm-12 col-md-4 d-flex flex-column align-items-start align-items-md-end justify-content-center">
                                             <div class="d-flex mb-3">
                                               
-                                                <a class="btn btn-primary" href="{{ route('page.clients.hire', ['technician' => $technician->id]) }}">
+                                                <a class="btn btn-primary" href="{{ route('page.clients.showContact', ['technician_id' => $technician->id]) }}">
                                                     Hire Now
                                                 </a>
                                             </div>

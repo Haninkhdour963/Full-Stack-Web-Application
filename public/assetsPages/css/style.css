@@ -533,3 +533,13 @@
         background-color: #4A628A;
         border-radius: 2px;
     }
+    .testimonial-item .d-flex {
+        display: flex;
+        justify-content: center; /* يجعل المحتوى في المنتصف */
+        align-items: center; /* محاذاة عمودية في المنتصف */
+    }
+    
+    .testimonial-item .ps-3 {
+        text-align: center; /* محاذاة النص داخل العنصر إلى المنتصف */
+    }
+    

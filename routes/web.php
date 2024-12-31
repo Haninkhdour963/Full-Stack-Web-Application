@@ -71,6 +71,9 @@ Route::get('/explore-by-category', [PageHomeController::class, 'exploreByCategor
             Route::post('/post', [PageClientController::class, 'storeJobPost'])->name('page.clients.storeJobPost');
             Route::get('/contract', [PageClientController::class, 'signContract'])->name('page.clients.contract');
             Route::get('/hire', [PageClientController::class, 'hireTechnician'])->name('page.clients.hire');
+
+            Route::get('/contact/{technician_id}', [PageClientController::class, 'showContactForm'])->name('page.clients.showContact');
+            Route::post('/send-message', [PageClientController::class, 'sendMessage'])->name('page.clients.sendMessage');
         });
         
         // Technician Routes

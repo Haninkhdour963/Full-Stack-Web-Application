@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Page;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Contact;
 use App\Models\JobPosting;
 use App\Models\Technician;
 use GuzzleHttp\Middleware;
@@ -107,6 +108,46 @@ public function signContract(Request $request)
     
         return view('page.clients.hire', compact('technicians', 'filterType'));
     }
+
+
+
+    public function showContactForm($technician_id)
+    {
+        $technician = Technician::with('user')->findOrFail($technician_id);
+        // Get available job postings for the logged-in client
+        $jobPostings = JobPosting::where('client_id', auth()->id())
+                                ->where('status', 'open')
+                                ->get();
+        
+        return view('page.clients.contact-form', compact('technician', 'jobPostings'));
+    }
+
+    public function sendMessage(Request $request)
+    {
+        // Validate the request
+        $validated = $request->validate([
+            'technician_id' => 'required|exists:technicians,id',
+            'job_id' => 'required|exists:job_postings,id',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string'
+        ]);
+
+        // Create new contact record
+        Contact::create([
+            'technician_id' => $validated['technician_id'],
+            'job_id' => $validated['job_id'], // Add job_id
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'subject' => $validated['subject'],
+            'message' => $validated['message']
+        ]);
+
+        return redirect()->back()->with('success', 'Message sent successfully!');
+    }
+
+
     /**
      * Show the form for creating a new resource.
      */
