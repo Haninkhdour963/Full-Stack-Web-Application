@@ -27,10 +27,11 @@
                 <p class="mb-4" style="color: #4A628A;">Please fill out the form below to contact the technician about your project.</p>
 
                 @if($jobPostings->isEmpty())
-                    <div class="alert alert-warning">
-                        You need to create a job posting first before contacting a technician.
-                        <a href="{{ route('page.clients.post') }}" class="btn btn-primary mt-2">Create Job Posting</a>
-                    </div>
+                <div class="alert alert-warning custom-alert">
+    You need to create a job posting first before contacting a technician.
+    <a href="{{ route('page.clients.post') }}" class="btn btn-primary mt-2">Create Job Posting</a>
+</div>
+
                 @else
                     <form action="{{ route('page.clients.sendMessage') }}" method="POST" class="needs-validation" novalidate>
                         @csrf

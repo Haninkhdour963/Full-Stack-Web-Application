@@ -542,4 +542,9 @@
     .testimonial-item .ps-3 {
         text-align: center; /* محاذاة النص داخل العنصر إلى المنتصف */
     }
+    .custom-alert {
+        background-color: #DFF2EB;
+        color: #4A628A;
+        border: #4A628A;
+    }
     
