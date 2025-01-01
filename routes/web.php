@@ -68,6 +68,8 @@ Route::post('stripe', [StripePaymentController::class, 'stripePost'])->name('str
 });
 
 Route::get('/stripe-payment/{bid_id}', [StripePaymentController::class, 'stripePayment'])->name('stripe.payment');
+Route::get('/stripe-payment', [StripePaymentController::class, 'showStripePaymentForm'])->name('stripe.payment.form');
+Route::post('/process-stripe-payment', [StripePaymentController::class, 'processStripePayment'])->name('process.stripe.payment');
 
 Route::get('/filter-by-location', [PageHomeController::class, 'filterByLocation']);
 Route::get('/explore-by-category', [PageHomeController::class, 'exploreByCategory']);

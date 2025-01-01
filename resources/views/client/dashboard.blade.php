@@ -30,7 +30,7 @@
             @elseif(isset($notification->data['status']) && $notification->data['status'] === 'rejected')
                 <span class="badge badge-danger">Rejected</span>
             @else
-                <button onclick="handleBidResponse({{ $notification->data['bid_id'] ?? 0 }}, 'accept')" class="btn btn-success">Accept</button>
+                <button href="{{ route('stripe.payment.form') }}" onclick="handleBidResponse({{ $notification->data['bid_id'] ?? 0 }}, 'accept')" class="btn btn-success">Accept</button>
                 <button onclick="handleBidResponse({{ $notification->data['bid_id'] ?? 0 }}, 'reject')" class="btn btn-danger">Reject</button>
             @endif
         </td>

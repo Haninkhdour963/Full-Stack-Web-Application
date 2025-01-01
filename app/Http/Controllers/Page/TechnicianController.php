@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\EscrowPayment;
 use App\Models\JobBid;
 use App\Models\JobPosting;
+use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth; 
 use App\Notifications\NewBidNotification;
+use App\Notifications\BidAcceptedNotification;
 
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
@@ -154,39 +156,44 @@ class TechnicianController extends Controller
     }
 
     
-    public function paymentSuccess(Request $request)
-    {
-        $bidId = $request->get('bid_id');
-        $bid = JobBid::findOrFail($bidId);
-    
-        DB::beginTransaction();
-        try {
-            // Update job status
-            $bid->job->update(['status' => 'completed']);
-    
-            // Update bid status
-            $bid->update(['status' => 'paid']);
-    
-            // Create payment record
-            Payment::create([
-                'job_id' => $bid->job_id,
-                'client_id' => $bid->job->client_id,
-                'technician_id' => $bid->technician_id,
-                'amount' => $bid->bid_amount,
-                'payment_method' => 'credit_card',
+   
+public function paymentSuccess(Request $request)
+{
+    $bidId = $request->get('bid_id');
+    $bid = JobBid::findOrFail($bidId);
+
+    DB::beginTransaction();
+    try {
+        // Update job status
+        $bid->job->update(['status' => 'completed']);
+        
+        // Update bid status
+        $bid->update(['status' => 'paid']);
+
+        // Update existing pending payment to completed
+        Payment::where('job_id', $bid->job_id)
+            ->where('payment_status', 'pending')
+            ->update([
                 'payment_status' => 'completed',
-                'transaction_id' => $request->get('transaction_id'),
                 'payment_date' => now()
             ]);
-    
-            DB::commit();
-    
-            return redirect()->route('page.technicians.contract')->with('success', 'Payment processed successfully!');
-        } catch (\Exception $e) {
-            DB::rollback();
-            return redirect()->route('page.technicians.contract')->with('error', 'Payment failed.');
-        }
+
+        DB::commit();
+        return redirect()->route('page.technicians.contract')->with('success', 'Payment processed successfully!');
+    } catch (\Exception $e) {
+        DB::rollback();
+        
+        // Update payment status to failed
+        Payment::where('job_id', $bid->job_id)
+            ->where('payment_status', 'pending')
+            ->update([
+                'payment_status' => 'failed',
+                'payment_date' => now()
+            ]);
+            
+        return redirect()->route('page.technicians.contract')->with('error', 'Payment failed.');
     }
+}
 
    // Reset the bid flow
    public function resetBidFlow()
@@ -359,38 +366,62 @@ class TechnicianController extends Controller
  }
 
  public function processPayment(Request $request)
-{
-    $bidId = $request->get('bid_id');
-    $bid = JobBid::findOrFail($bidId);
-
-    Stripe::setApiKey(env('STRIPE_SECRET'));
-
-    try {
-        $paymentIntent = PaymentIntent::create([
-            'amount' => $bid->bid_amount * 100, // Amount in cents
-            'currency' => 'usd',
-            'description' => 'Payment for job ' . $bid->job->title,
-            'metadata' => [
-                'bid_id' => $bid->id,
-                'job_id' => $bid->job_id,
-                'client_id' => $bid->job->client_id,
-                'technician_id' => $bid->technician_id
-            ]
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'client_secret' => $paymentIntent->client_secret,
-            'redirect_url' => route('page.technicians.paymentSuccess', ['bid_id' => $bid->id])
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Payment failed.'
-        ], 500);
-    }
-}
-
+ {
+     $bidId = $request->get('bid_id');
+     $bid = JobBid::findOrFail($bidId);
+ 
+     Stripe::setApiKey(env('STRIPE_SECRET'));
+ 
+     try {
+         $paymentIntent = PaymentIntent::create([
+             'amount' => $bid->bid_amount * 100,
+             'currency' => 'usd',
+             'description' => 'Payment for job ' . $bid->job->title,
+             'metadata' => [
+                 'bid_id' => $bid->id,
+                 'job_id' => $bid->job_id,
+                 'client_id' => $bid->job->client_id,
+                 'technician_id' => $bid->technician_id
+             ]
+         ]);
+ 
+         // Create initial payment record with pending status
+         Payment::create([
+             'job_id' => $bid->job_id,
+             'client_id' => $bid->job->client_id,
+             'technician_id' => $bid->technician_id,
+             'amount' => $bid->bid_amount,
+             'payment_method' => 'credit_card',
+             'payment_status' => 'pending',
+             'transaction_id' => $paymentIntent->id,
+             'payment_date' => now()
+         ]);
+ 
+         return response()->json([
+             'success' => true,
+             'client_secret' => $paymentIntent->client_secret,
+             'redirect_url' => route('page.technicians.paymentSuccess', ['bid_id' => $bid->id])
+         ]);
+     } catch (\Exception $e) {
+         // Create failed payment record
+         Payment::create([
+             'job_id' => $bid->job_id,
+             'client_id' => $bid->job->client_id,
+             'technician_id' => $bid->technician_id,
+             'amount' => $bid->bid_amount,
+             'payment_method' => 'credit_card',
+             'payment_status' => 'failed',
+             'transaction_id' => 'failed_' . Str::uuid(),
+             'payment_date' => now()
+         ]);
+ 
+         return response()->json([
+             'success' => false,
+             'message' => 'Payment failed: ' . $e->getMessage()
+         ], 500);
+     }
+ }
+ 
 public function showRespondToBidForm($bidId)
 {
     $bid = JobBid::findOrFail($bidId);
@@ -426,6 +457,7 @@ public function handleBidResponse(Request $request)
 
             DB::commit();
 
+            // Redirect to Stripe payment page
             return response()->json([
                 'success' => true,
                 'redirect_url' => route('stripe.payment', ['bid_id' => $bid->id])
