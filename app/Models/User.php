@@ -8,10 +8,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\DatabaseNotification;
+
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable,SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
     
 
     /**
@@ -102,5 +104,10 @@ class User extends Authenticatable
          return $this->user_role === 'technician';
      }
 
+ // Other methods and properties...
 
+ public function notifications()
+ {
+     return $this->morphMany(DatabaseNotification::class, 'notifiable')->orderBy('created_at', 'desc');
+ }
 }

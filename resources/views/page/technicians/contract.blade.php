@@ -22,27 +22,27 @@
     <div class="container">
         <!-- Card Wrapper for Filter Form -->
         <div class="card p-4 shadow-sm">
-            <h4 class="text-center mb-4">Filter Jobs</h4>
-            <form method="GET" action="{{ route('page.technicians.bid') }}" class="mb-4">
-                <div class="row">
-                    <div class="col-12 col-md-3 mb-3">
-                        <input type="text" name="location" class="form-control form-control-lg" placeholder="Location" value="{{ request('location') }}">
-                    </div>
-                    <div class="col-12 col-md-3 mb-3">
-                        <input type="text" name="duration" class="form-control form-control-lg" placeholder="Duration" value="{{ request('duration') }}">
-                    </div>
-                    <div class="col-12 col-md-2 mb-3">
-                        <input type="number" name="min_budget" class="form-control form-control-lg" placeholder="Min Budget" value="{{ request('min_budget') }}">
-                    </div>
-                    <div class="col-12 col-md-2 mb-3">
-                        <input type="number" name="max_budget" class="form-control form-control-lg" placeholder="Max Budget" value="{{ request('max_budget') }}">
-                    </div>
-                    <div class="col-12 col-md-2">
-                        <button type="submit" class="btn btn-primary w-100 btn-lg">Search A Job </button>
-                    </div>
-                </div>
-            </form>
+    <h4 class="text-center mb-4">Filter Jobs</h4>
+    <form id="filterForm" class="mb-4">
+        <div class="row">
+            <div class="col-12 col-md-3 mb-3">
+                <input type="text" name="location" class="form-control form-control-lg" placeholder="Location" value="{{ request('location') }}">
+            </div>
+            <div class="col-12 col-md-3 mb-3">
+                <input type="text" name="duration" class="form-control form-control-lg" placeholder="Duration" value="{{ request('duration') }}">
+            </div>
+            <div class="col-12 col-md-2 mb-3">
+                <input type="number" name="min_budget" class="form-control form-control-lg" placeholder="Min Budget" value="{{ request('min_budget') }}">
+            </div>
+            <div class="col-12 col-md-2 mb-3">
+                <input type="number" name="max_budget" class="form-control form-control-lg" placeholder="Max Budget" value="{{ request('max_budget') }}">
+            </div>
+            <div class="col-12 col-md-2">
+                <button type="submit" class="btn btn-primary w-100 btn-lg">Search A Job</button>
+            </div>
         </div>
+    </form>
+</div>
         <!-- Card Wrapper End -->
     </div>
 </div>
@@ -63,7 +63,7 @@
                                 <th>Bid Date</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="bidTableBody">
                             @foreach ($bids as $bid)
                                 <tr>
                                     <td>{{ $bid->job ? $bid->job->title : 'No Job' }}</td>
@@ -92,4 +92,70 @@
             {{ $bids->links('vendor.pagination.custom') }}
         </div>
     </div>
+
+    <script>
+        document.getElementById('filterForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent page reload
+
+            const formData = new FormData(this);
+            const params = new URLSearchParams(formData).toString(); // Serialize form data to query string
+
+            fetch("{{ route('page.technicians.contract') }}?" + params, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest', // Indicate that it's an AJAX request
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update the table with new data
+                updateTable(data.bids);
+                // Update pagination links
+                document.querySelector('.pagination').innerHTML = data.pagination;
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        function updateTable(bids) {
+            const tbody = document.getElementById('bidTableBody');
+            tbody.innerHTML = ''; // Clear current table content
+
+            bids.forEach(bid => {
+                const row = `
+                    <tr>
+                        <td>${bid.job ? bid.job.title : 'No Job'}</td>
+                        <td>${bid.technician ? bid.technician.name : 'No Technician'}</td>
+                        <td>$${parseFloat(bid.bid_amount).toFixed(2)}</td>
+                        <td>
+                            <span class="badge ${getStatusClass(bid.status)}">
+                                ${capitalizeStatus(bid.status)}
+                            </span>
+                        </td>
+                        <td>${bid.bid_date ? new Date(bid.bid_date).toLocaleString() : 'No Date'}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function getStatusClass(status) {
+            switch (status) {
+                case 'pending': return 'bg-warning';
+                case 'accepted': return 'bg-success';
+                case 'rejected': return 'bg-danger';
+                default: return '';
+            }
+        }
+
+        function capitalizeStatus(status) {
+            return status.charAt(0).toUpperCase() + status.slice(1);
+        }
+
+        function updatePagination(paginationHtml) {
+    const paginationContainer = document.querySelector('.pagination');
+    if (paginationContainer) {
+        paginationContainer.innerHTML = paginationHtml;
+    }
+}
+    </script>
 @endsection

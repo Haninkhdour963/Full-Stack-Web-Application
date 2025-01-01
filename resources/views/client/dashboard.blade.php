@@ -3,6 +3,46 @@
 @section('title', 'Client Dashboard')
 
 @section('content')
+
+<div class="col-md-12 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Notifications</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Message</th>
+                            <th>Bid Amount</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach(Auth::user()->notifications as $notification)
+    <tr>
+        <td>{{ $loop->iteration }}</td>
+        <td>{{ $notification->data['message'] ?? 'No message' }}</td>
+        <td>${{ number_format($notification->data['bid_amount'] ?? 0, 2) }}</td>
+        <td id="action-{{ $notification->data['bid_id'] ?? 0 }}">
+            @if(isset($notification->data['status']) && $notification->data['status'] === 'accepted')
+                <span class="badge badge-success">Accepted</span>
+            @elseif(isset($notification->data['status']) && $notification->data['status'] === 'rejected')
+                <span class="badge badge-danger">Rejected</span>
+            @else
+                <button onclick="handleBidResponse({{ $notification->data['bid_id'] ?? 0 }}, 'accept')" class="btn btn-success">Accept</button>
+                <button onclick="handleBidResponse({{ $notification->data['bid_id'] ?? 0 }}, 'reject')" class="btn btn-danger">Reject</button>
+            @endif
+        </td>
+    </tr>
+@endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-md-3 grid-margin stretch-card">
         <div class="card card-sales">
@@ -157,4 +197,32 @@
       }
   });
 </script>
+
+<script>
+function handleBidResponse(bidId, action) {
+    fetch(`/technician/handle-bid-response`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ bid_id: bidId, action: action })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (action === 'accept') {
+                window.location.href = data.redirect_url; // Redirect for "Accept"
+            } else {
+                // Update the action cell to show "Rejected"
+                document.getElementById(`action-${bidId}`).innerHTML = '<span class="badge badge-danger">Rejected</span>';
+            }
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
+
 @endpush
