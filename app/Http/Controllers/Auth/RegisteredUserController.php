@@ -65,6 +65,7 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
         // Redirect to home page
-        return redirect(RouteServiceProvider::HOME);
+        // return redirect(RouteServiceProvider::HOME);
+        return redirect()->route('index');
     }
 }

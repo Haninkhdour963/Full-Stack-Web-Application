@@ -284,6 +284,7 @@
             .auth-image h1 {
                 font-size: 2rem;
             }
+            
         }
     </style>
 </head>
@@ -293,24 +294,28 @@
             <div>
                 <h1 style="text-align:center">   Tas'heel</h1>
                 <p>Enter your credentials to access your account and continue your journey with us.</p>
+                
+              
+            </div>
+            <div>
+                
             </div>
             <div class="floating-shapes">
-                <!-- Add SVG shapes or patterns here for visual interest -->
+            <img  src="{{ asset('assetsPages/img/15.gif') }}" alt=""style="width:100%;height:100%">
             </div>
         </div>
 
         <div class="auth-content">
             <div class="auth-tabs">
                 <button class="active" id="loginTab">Sign In</button>
-                <button id="registerTab">Create Account</button>
+                <button id="registerTab">Create Client</button>
+                <button id="registerTabT">Create Technician</button>
             </div>
 
             <!-- Login Form -->
             <div class="form-section active" id="loginForm">
                 <form method="POST" action="{{ route('login') }}">
                     @csrf
-                    
-
                     
                     <div class="input-group">
                         <label>Email address</label>
@@ -382,10 +387,8 @@
                     <div class="input-group">
                         <label>User Role</label>
                         <select name="user_role" required>
-                            <option value="">Select Role</option>
-                            <option value="admin" {{ old('user_role') === 'admin' ? 'selected' : '' }}>Admin</option>
+                           
                             <option value="client" {{ old('user_role') === 'client' ? 'selected' : '' }}>Client</option>
-                            <option value="technician" {{ old('user_role') === 'technician' ? 'selected' : '' }}>Technician</option>
                         </select>
                         @error('user_role')
                             <div class="error-message">{{ $message }}</div>
@@ -416,32 +419,161 @@
                     <button type="submit" class="submit-button">Create Account</button>
                 </form>
             </div>
+
+            <!-- RegisterT Form -->
+            <div class="form-section" id="registerTForm">
+                <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
+                    @csrf
+                    <div class="input-group">
+                        <label>Full Name</label>
+                        <input type="text" name="name" value="{{ old('name') }}" required>
+                        @error('name')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="input-group">
+                        <label>Email address</label>
+                        <input type="email" name="email" value="{{ old('email') }}" required>
+                        @error('email')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="input-group">
+                        <label>Mobile Phone</label>
+                        <input type="tel" name="mobile_phone" value="{{ old('mobile_phone') }}" required>
+                        @error('mobile_phone')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="input-group">
+                        <label>Identity Number</label>
+                        <input type="text" name="identity_number" value="{{ old('identity_number') }}">
+                        @error('identity_number')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="input-group">
+                        <label>Skills</label>
+                        <input type="text" name="skills" value="{{ old('skills') }}">
+                        @error('skills')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="input-group">
+                        <label>Hourly Rate</label>
+                        <input type="number" name="hourly_rate" value="{{ old('hourly_rate') }}">
+                        @error('hourly_rate')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="input-group">
+                        <label>Location</label>
+                        <input type="text" name="location" value="{{ old('location') }}">
+                        @error('location')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="input-group">
+                        <label>Available From</label>
+                        <input type="datetime" name="available_from" value="{{ old('available_from') }}">
+                        @error('available_from')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="input-group">
+                        <label>Bio</label>
+                        <input type="text" name="bio" value="{{ old('bio') }}">
+                        @error('bio')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+
+                    <div class="input-group">
+                        <label>User Role</label>
+                        <select name="user_role" required>
+                           
+                            <option value="technician" {{ old('user_role') === 'technician' ? 'selected' : '' }}>Technician</option>
+                        </select>
+                        @error('user_role')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="input-group">
+                        <label>Profile Image</label>
+                        <input type="file" name="profile_image">
+                        @error('profile_image')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="input-group">
+                        <label>Password</label>
+                        <input type="password" name="password" required>
+                        @error('password')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="input-group">
+                        <label>Confirm Password</label>
+                        <input type="password" name="password_confirmation" required>
+                    </div>
+
+                    <button type="submit" class="submit-button">Create Technician Account</button>
+                </form>
+            </div>
         </div>
     </div>
 
     <script>
         const loginTab = document.getElementById('loginTab');
         const registerTab = document.getElementById('registerTab');
+        const registerTabT = document.getElementById('registerTabT');
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
+        const registerTForm = document.getElementById('registerTForm');
 
         loginTab.addEventListener('click', () => {
             loginTab.classList.add('active');
             registerTab.classList.remove('active');
+            registerTabT.classList.remove('active');
             loginForm.classList.add('active');
             registerForm.classList.remove('active');
+            registerTForm.classList.remove('active');
         });
 
         registerTab.addEventListener('click', () => {
             registerTab.classList.add('active');
             loginTab.classList.remove('active');
+            registerTabT.classList.remove('active');
             registerForm.classList.add('active');
             loginForm.classList.remove('active');
+            registerTForm.classList.remove('active');
         });
 
-        // Show registration form if there are any registration errors
+        registerTabT.addEventListener('click', () => {
+            registerTabT.classList.add('active');
+            loginTab.classList.remove('active');
+            registerTab.classList.remove('active');
+            registerTForm.classList.add('active');
+            loginForm.classList.remove('active');
+            registerForm.classList.remove('active');
+        });
+
         @if($errors->hasAny(['name', 'mobile_phone', 'phone_number', 'user_role', 'profile_image', 'password_confirmation']))
             registerTab.click();
+        @endif
+
+        @if($errors->hasAny(['name', 'mobile_phone', 'phone_number', 'user_role', 'profile_image', 'password_confirmation']))
+            registerTabT.click();
         @endif
     </script>
 </body>
