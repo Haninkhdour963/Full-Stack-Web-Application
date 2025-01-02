@@ -420,116 +420,125 @@
                 </form>
             </div>
 
-            <!-- RegisterT Form -->
-            <div class="form-section" id="registerTForm">
-                <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
-                    @csrf
-                    <div class="input-group">
-                        <label>Full Name</label>
-                        <input type="text" name="name" value="{{ old('name') }}" required>
-                        @error('name')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
+              <!-- RegisterT Form -->
+<div class="form-section" id="registerTForm">
+    <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
+    @csrf
+    <input type="hidden" name="user_role" value="technician">
+        <div class="input-group">
+            <label>Full Name</label>
+            <input type="text" name="name" value="{{ old('name') }}" required>
+            @error('name')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div>
 
-                    <div class="input-group">
-                        <label>Email address</label>
-                        <input type="email" name="email" value="{{ old('email') }}" required>
-                        @error('email')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
+        <div class="input-group">
+            <label>Email address</label>
+            <input type="email" name="email" value="{{ old('email') }}" required>
+            @error('email')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div>
 
-                    <div class="input-group">
-                        <label>Mobile Phone</label>
-                        <input type="tel" name="mobile_phone" value="{{ old('mobile_phone') }}" required>
-                        @error('mobile_phone')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
+        <div class="input-group">
+            <label>Mobile Phone</label>
+            <input type="tel" name="mobile_phone" value="{{ old('mobile_phone') }}" required>
+            @error('mobile_phone')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div>
 
-                    <div class="input-group">
-                        <label>Identity Number</label>
-                        <input type="text" name="identity_number" value="{{ old('identity_number') }}">
-                        @error('identity_number')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="input-group">
-                        <label>Skills</label>
-                        <input type="text" name="skills" value="{{ old('skills') }}">
-                        @error('skills')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
+        <div class="input-group">
+            <label>Phone Number (optional)</label>
+            <input type="tel" name="phone_number" value="{{ old('phone_number') }}">
+            @error('phone_number')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div>
 
-                    <div class="input-group">
-                        <label>Hourly Rate</label>
-                        <input type="number" name="hourly_rate" value="{{ old('hourly_rate') }}">
-                        @error('hourly_rate')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
+        <div class="input-group">
+            <label>Identity Number</label>
+            <input type="text" name="identity_number" value="{{ old('identity_number') }}">
+            @error('identity_number')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div>
 
-                    <div class="input-group">
-                        <label>Location</label>
-                        <input type="text" name="location" value="{{ old('location') }}">
-                        @error('location')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="input-group">
-                        <label>Available From</label>
-                        <input type="datetime" name="available_from" value="{{ old('available_from') }}">
-                        @error('available_from')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
+        <div class="input-group">
+            <label>Skills</label>
+            <input type="text" name="skills" value="{{ old('skills') }}">
+            @error('skills')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div>
 
-                    <div class="input-group">
-                        <label>Bio</label>
-                        <input type="text" name="bio" value="{{ old('bio') }}">
-                        @error('bio')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
+        <div class="input-group">
+            <label>Hourly Rate</label>
+            <input type="number" name="hourly_rate" value="{{ old('hourly_rate') }}">
+            @error('hourly_rate')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div>
 
+        <div class="input-group">
+            <label>Location</label>
+            <input type="text" name="location" value="{{ old('location') }}">
+            @error('location')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div>
 
-                    <div class="input-group">
-                        <label>User Role</label>
-                        <select name="user_role" required>
-                           
-                            <option value="technician" {{ old('user_role') === 'technician' ? 'selected' : '' }}>Technician</option>
-                        </select>
-                        @error('user_role')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
+        <div class="input-group">
+            <label>Available From</label>
+            <input type="datetime-local" name="available_from" value="{{ old('available_from') }}">
+            @error('available_from')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div>
 
-                    <div class="input-group">
-                        <label>Profile Image</label>
-                        <input type="file" name="profile_image">
-                        @error('profile_image')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
+        <div class="input-group">
+            <label>Bio</label>
+            <input type="text" name="bio" value="{{ old('bio') }}">
+            @error('bio')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div>
 
-                    <div class="input-group">
-                        <label>Password</label>
-                        <input type="password" name="password" required>
-                        @error('password')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
+        <div class="input-group">
+            <label>User Role</label>
+            <select name="user_role" required>
+                <option value="technician" {{ old('user_role') === 'technician' ? 'selected' : '' }}>Technician</option>
+            </select>
+            @error('user_role')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div>
 
-                    <div class="input-group">
-                        <label>Confirm Password</label>
-                        <input type="password" name="password_confirmation" required>
-                    </div>
+        <div class="input-group">
+            <label>Profile Image</label>
+            <input type="file" name="profile_image">
+            @error('profile_image')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div>
 
-                    <button type="submit" class="submit-button">Create Technician Account</button>
-                </form>
-            </div>
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" name="password" required>
+            @error('password')
+                <div class="error-message">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="input-group">
+            <label>Confirm Password</label>
+            <input type="password" name="password_confirmation" required>
+        </div>
+
+        <button type="submit" class="submit-button">Create Technician Account</button>
+    </form>
+</div>
         </div>
     </div>
 

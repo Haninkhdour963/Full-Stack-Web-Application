@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Technician;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -24,48 +25,69 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Handle an incoming registration request.
+     * Handle an incoming registration request for a technician.
      *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'mobile_phone' => ['required', 'max:10'],
-            'phone_number' => ['nullable', 'max:15'], // Make phone_number optional
-            'user_role' => ['required', 'in:admin,client,technician'], // Validating user_role field
-            'profile_image' => ['nullable', 'image', 'max:2048'], // Validating profile_image (optional)
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+{
+    
+    $request->validate([
+        'name' => ['required', 'string', 'max:255'],
+        'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+        'mobile_phone' => ['required', 'string', 'max:20'],
+        'phone_number' => ['nullable', 'string', 'max:20'],
+        'user_role' => ['required', 'in:admin,client,technician'],
+        'profile_image' => ['nullable', 'image', 'max:2048'],
+        'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        'identity_number' => ['required_if:user_role,technician', 'string', 'max:255'],
+        'skills' => ['required_if:user_role,technician', 'string'],
+        'hourly_rate' => ['required_if:user_role,technician', 'numeric', 'min:0'],
+        'bio' => ['required_if:user_role,technician', 'string'],
+        'location' => ['required_if:user_role,technician', 'string'],
+        'available_from' => ['required_if:user_role,technician', 'date'],
+    ]);
 
-        $userData = $request->only(['name', 'email', 'mobile_phone', 'phone_number', 'user_role', 'profile_image']);
-
-        // Handle profile image upload if provided
-        if ($request->hasFile('profile_image')) {
-            $userData['profile_image'] = $request->file('profile_image')->store('profile_images', 'public');
-        }
-
-        // Create new user
-        $user = User::create([
-            'name' => $userData['name'],
-            'email' => $userData['email'],
-            'mobile_phone' => $userData['mobile_phone'],
-            'phone_number' => $userData['phone_number'] ?? null,
-            'user_role' => $userData['user_role'],
-            'profile_image' => $userData['profile_image'] ?? null,
-            'password' => Hash::make($request->password),
-        ]);
-
-        // Fire Registered event
-        event(new Registered($user));
-
-        // Log in the newly created user
-        Auth::login($user);
-
-        // Redirect to home page
-        // return redirect(RouteServiceProvider::HOME);
-        return redirect()->route('index');
+    // Handle profile image upload
+    $profileImagePath = null;
+    if ($request->hasFile('profile_image')) {
+        $profileImagePath = $request->file('profile_image')->store('profile_images', 'public');
     }
+
+    // Create the user
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'mobile_phone' => $request->mobile_phone,
+        'phone_number' => $request->phone_number,
+        'user_role' => $request->user_role,
+        'profile_image' => $profileImagePath,
+        'password' => Hash::make($request->password),
+    ]);
+
+   // If the user is a technician, create a technician record
+if ($request->user_role === 'technician') {
+    // Create the technician record with explicit user_id
+    $technician = new Technician([
+        'user_id' => $user->id,
+        'identity_number' => $request->identity_number,
+        'skills' => $request->skills,
+        'hourly_rate' => $request->hourly_rate,
+        'bio' => $request->bio,
+        'location' => $request->location,
+        'available_from' => $request->available_from,
+    ]);
+    
+    $user->technician()->save($technician);
+}
+
+    
+
+    // Trigger the Registered event and log in the user
+    event(new Registered($user));
+    Auth::login($user);
+
+    // Redirect to the desired route
+    return redirect()->route('index');
+}
 }

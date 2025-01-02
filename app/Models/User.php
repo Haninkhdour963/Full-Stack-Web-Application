@@ -88,6 +88,13 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
     
+
+    public function technician()
+    {
+        return $this->hasOne(Technician::class);
+    }
+
+
      // Method to check roles
      public function isAdmin()
      {

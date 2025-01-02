@@ -10,8 +10,16 @@ class Technician extends Model
 {
     use HasFactory,SoftDeletes;
     protected $fillable = [
-        'commercial_records', 'identity_number', 'skills', 'hourly_rate', 
-        'certifications', 'bio', 'location', 'rating', 'available_from'
+        'user_id',  // Remove the space before user_id
+        'commercial_records',
+        'identity_number', 
+        'skills', 
+        'hourly_rate', 
+        'certifications', 
+        'bio', 
+        'location', 
+        'rating', 
+        'available_from'
     ];
 
     // A technician belongs to a user
