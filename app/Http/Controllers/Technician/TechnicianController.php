@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Technician;
 
 use App\Http\Controllers\Controller;
 use App\Models\Technician;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -22,9 +23,7 @@ class TechnicianController extends Controller
     public function index()
     {
         // Get the currently authenticated technician
-        $technician = Auth::user();
-        
-        // Pass only the current technician's data to the view
+        $technician = Auth::user()->technician;
         return view('technician.technicians.index', compact('technician'));
     }
 
@@ -34,58 +33,55 @@ class TechnicianController extends Controller
     public function show($id)
     {
         try {
-            $technician = Technician::findOrFail($id);
-            return response()->json($technician);
+            $technician = Technician::with('user')->findOrFail($id);
+            return response()->json([
+                'user' => [
+                    'name' => $technician->user->name,
+                    'email' => $technician->user->email,
+                    'mobile_phone' => $technician->user->mobile_phone,
+                    'profile_image' => $technician->user->profile_image,
+                ],
+                'identity_number' => $technician->identity_number,
+                'skills' => $technician->skills,
+                'hourly_rate' => $technician->hourly_rate,
+                'rating' => $technician->rating,
+                'location' => $technician->location,
+            ]);
         } catch (\Exception $e) {
             Log::error('Error fetching technician data: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to fetch technician data'], 500);
         }
     }
 
-   
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        // This would render a view for creating a new technician
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        // Logic to store a new technician in the database
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        // Logic for showing the edit form for a technician
-    }
-
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        // Logic to update a technician's details
-    }
+        try {
+            $technician = Technician::findOrFail($id);
+            $user = $technician->user;
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        // Logic to permanently delete a technician
+            // Update user data
+            $user->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'mobile_phone' => $request->mobile_phone,
+            ]);
+
+            // Update technician data
+            $technician->update([
+                'identity_number' => $request->identity_number,
+                'skills' => $request->skills,
+                'hourly_rate' => $request->hourly_rate,
+                'rating' => $request->rating,
+                'location' => $request->location,
+            ]);
+
+            return response()->json(['message' => 'Technician updated successfully', 'data' => $technician]);
+        } catch (\Exception $e) {
+            Log::error('Error updating technician: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to update technician'], 500);
+        }
     }
 }

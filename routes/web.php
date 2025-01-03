@@ -185,9 +185,11 @@ Route::middleware(['auth'])->group(function () {
     // Technician Routes
     Route::prefix('technician')->middleware('role:technician')->group(function () {
         Route::get('/dashboard', [TechnicianDashboard::class, 'index'])->name('technician.dashboard');
+
         Route::resource('technicians', TechnicianTechnicianController::class)->names('technician.technicians');
         Route::get('/technician/technicians/{id}', [TechnicianTechnicianController::class, 'show']);
         Route::put('/technician/technicians/{id}', [TechnicianTechnicianController::class, 'update']);
+
         Route::resource('jobBids', TechnicianJobBidController::class)->names('technician.jobBids');
         Route::resource('escrowPayments', TechnicianEscrowPaymentController::class)->names('technician.escrowPayments');
         Route::resource('payments', TechnicianPaymentController::class)->names('technician.payments');
