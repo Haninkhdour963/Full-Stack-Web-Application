@@ -62,7 +62,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:users,name',
             'email' => 'required|email|max:255|unique:users,email',
-            'user_role' => 'required|in:admin,client,technician',
+            // 'user_role' => 'required|in:admin,client,technician',
         ]);
 
         // Create and save the user
@@ -92,7 +92,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $id,
-            'user_role' => 'required|in:admin,client,technician',
+            // 'user_role' => 'required|in:admin,client,technician',
             'password' => 'nullable|string|min:6', // Password is optional
         ]);
     
@@ -102,7 +102,7 @@ class UserController extends Controller
         // Update user data
         $user->name = $request->input('name');
         $user->email = $request->input('email');
-        $user->user_role = $request->input('user_role');
+        // $user->user_role = $request->input('user_role');
     
         // Update password only if provided
         if ($request->has('password') && $request->input('password')) {

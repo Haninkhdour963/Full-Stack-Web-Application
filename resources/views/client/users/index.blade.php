@@ -7,7 +7,7 @@
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">My Profile: {{ $user->name }}</h4>
+                <h4 class="card-title">My Profile</h4>
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
@@ -115,14 +115,14 @@
         <label for="updateUserEmail" class="form-label">Email</label>
         <input type="email" class="form-control" id="updateUserEmail" name="email" required>
     </div>
-    <div class="mb-3">
+    <!-- <div class="mb-3">
         <label for="updateUserRole" class="form-label">Role</label>
         <select class="form-select" id="updateUserRole" name="user_role" required>
-            <option value="admin">Admin</option>
+           
             <option value="client">Client</option>
-            <option value="technician">Technician</option>
+        
         </select>
-    </div>
+    </div> -->
     <div class="mb-3">
         <label for="updateUserPassword" class="form-label">Password</label>
         <input type="password" class="form-control" id="updateUserPassword" name="password">
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('updateUserId').value = user.id;
             document.getElementById('updateUserName').value = user.name;
             document.getElementById('updateUserEmail').value = user.email;
-            document.getElementById('updateUserRole').value = user.user_role;
+        //    //
 
             $('#updateUserModal').modal('show');
         });
