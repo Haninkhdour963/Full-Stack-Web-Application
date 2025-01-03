@@ -24,19 +24,16 @@ class JobBidController extends Controller
         return view('admin.jobBids.index', compact('jobBids'));
     }
 
-    /**
-     * Soft delete the JobBid.
-     */
     public function softDelete($id)
     {
         $jobBid = JobBid::findOrFail($id);
-
+    
         // Soft delete the JobBid
         $jobBid->delete();
-
+    
         return response()->json(['success' => true]);
     }
-
+    
     /**
      * Show the details of a specific JobBid.
      */

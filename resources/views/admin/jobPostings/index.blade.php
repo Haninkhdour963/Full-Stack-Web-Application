@@ -98,37 +98,42 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.view-btn').forEach(button => {
-            button.addEventListener('click', async () => {
-                const jobPostingId = button.getAttribute('data-id');
-
-                try {
-                    // Fetch the job posting details from the server
-                    const response = await fetch(`/admin/jobPostings/${jobPostingId}`);
-                    const data = await response.json();
-
-                    if (response.ok && data) {
-                        // Populate the modal with the fetched data
-                        document.getElementById('modal-title').innerText = data.title;
-                        document.getElementById('modal-description').innerText = data.description;
-                        document.getElementById('modal-category').innerText = data.category ? data.category.category_name : 'N/A';
-                        document.getElementById('modal-client').innerText = data.client ? data.client.name : 'N/A';
-                        document.getElementById('modal-location').innerText = data.location;
-                        document.getElementById('modal-budget').innerText = `$${data.budget_min} - $${data.budget_max}`;
-                        document.getElementById('modal-status').innerText = data.status;
-                        document.getElementById('modal-posted_at').innerText = data.posted_at ? new Date(data.posted_at).toLocaleString() : 'N/A';
-
-                        // Show the modal
-                        $('#jobPostingModal').modal('show');
-                    } else {
-                        Swal.fire('Error', 'Failed to fetch job posting details.', 'error');
+   document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.soft-delete-btn').forEach(button => {
+        button.addEventListener('click', async () => {
+            const jobPostingId = button.getAttribute('data-id');
+            
+            try {
+                // إرسال طلب لحذف الـ Job Posting باستخدام الـ Soft Delete
+                const response = await fetch(`/admin/jobPostings/${jobPostingId}/soft-delete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     }
-                } catch (error) {
-                    Swal.fire('Error', 'Network error. Failed to fetch job posting details.', 'error');
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // عرض رسالة نجاح باستخدام SweetAlert
+                    Swal.fire('Success', 'Job posting soft deleted successfully.', 'success');
+
+                    // تحديث الواجهة بدون عمل ريفرش (إخفاء الوظيفة المحذوفة أو تعديل الستايل)
+                    const row = document.getElementById(`jobPosting-row-${jobPostingId}`);
+                    row.classList.add('text-muted');  // إضافة "text-muted" لجعل الوظيفة تبدو محذوفة
+                    row.querySelector('.soft-delete-btn').setAttribute('disabled', 'true'); // تعطيل زر الحذف
+                    row.querySelector('.soft-delete-btn').innerText = 'Deleted'; // تغيير نص الزر
+                } else {
+                    Swal.fire('Error', 'Failed to soft delete the job posting.', 'error');
                 }
-            });
+            } catch (error) {
+                Swal.fire('Error', 'Network error. Failed to soft delete the job posting.', 'error');
+            }
         });
     });
+});
+
+
 </script>
 @endpush

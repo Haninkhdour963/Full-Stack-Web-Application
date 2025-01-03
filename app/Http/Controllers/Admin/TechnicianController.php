@@ -97,4 +97,8 @@ class TechnicianController extends Controller
     {
         //
     }
+
+
+ 
+
 }

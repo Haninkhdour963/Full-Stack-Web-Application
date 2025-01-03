@@ -15,6 +15,7 @@
                             <th>#</th>
                             <th>Message</th>
                             <th>Bid Amount</th>
+                            <th>Payment Date</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -24,6 +25,8 @@
         <td>{{ $loop->iteration }}</td>
         <td>{{ $notification->data['message'] ?? 'No message' }}</td>
         <td>${{ number_format($notification->data['bid_amount'] ?? 0, 2) }}</td>
+        <td>{{ \Carbon\Carbon::parse($notification->data['payment_date'] ?? now())->format('Y-m-d') }} </td>
+       
         <td id="action-{{ $notification->data['bid_id'] ?? 0 }}">
             @if(isset($notification->data['status']) && $notification->data['status'] === 'accepted')
                 <span class="badge badge-success">Accepted</span>

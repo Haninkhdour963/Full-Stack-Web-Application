@@ -170,8 +170,12 @@ Route::middleware(['auth'])->group(function () {
     // Client Routes
     Route::prefix('client')->middleware('role:client')->group(function () {
         Route::get('/dashboard', [ClientDashboard::class, 'index'])->name('client.dashboard');
+        
         Route::resource('users', ClientUserController::class)->names('client.users');
+        Route::post('users/{id}/softDelete', [ClientUserController::class, 'softDelete'])->name('client.users.softDelete');
+        Route::post('users/{id}', [ClientUserController::class, 'update'])->name('client.users.update');
         Route::get('users/{userId}/view-profile', [ClientUserController::class, 'viewProfile']);
+
         Route::resource('jobPostings', ClientJobPostingController::class)->names('client.jobPostings');
         Route::resource('payments', ClientPaymentController::class)->names('client.payments');
         Route::resource('reviews', ClientReviewController::class)->names('client.reviews');

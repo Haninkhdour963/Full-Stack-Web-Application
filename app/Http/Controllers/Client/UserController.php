@@ -38,23 +38,23 @@ class UserController extends Controller
         return response()->json($user);
     }
 
-    // Soft delete the user
     public function softDelete($id)
     {
         try {
             $user = User::findOrFail($id);  // Find the user by ID
-
+    
             if ($user->deleted_at) {
                 return response()->json(['error' => 'User already deleted.'], 400);
             }
-
+    
             $user->delete();  // Perform the soft delete
-
+    
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to delete user. ' . $e->getMessage()], 500);
         }
     }
+    
 
     // Store a newly created user in storage
     public function store(Request $request)
@@ -86,21 +86,33 @@ class UserController extends Controller
         return view('client.users.edit', compact('user'));
     }
 
-    // Update the user information
     public function update(Request $request, $id)
     {
+        // Validate the request data
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $id,
             'user_role' => 'required|in:admin,client,technician',
+            'password' => 'nullable|string|min:6', // Password is optional
         ]);
-
+    
+        // Find the user
         $user = User::findOrFail($id);
+    
+        // Update user data
         $user->name = $request->input('name');
         $user->email = $request->input('email');
         $user->user_role = $request->input('user_role');
+    
+        // Update password only if provided
+        if ($request->has('password') && $request->input('password')) {
+            $user->password = bcrypt($request->input('password'));
+        }
+    
         $user->save();
-
-        return redirect()->route('users.index')->with('success', 'User updated successfully');
+    
+        // Return a JSON response
+        return response()->json(['success' => true, 'message' => 'User updated successfully']);
     }
+    
 }

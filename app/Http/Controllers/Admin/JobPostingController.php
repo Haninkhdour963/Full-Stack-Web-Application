@@ -23,18 +23,16 @@ class JobPostingController extends Controller
         return view('admin.jobPostings.index', compact('jobPostings'));
     }
 
-    /**
-     * Soft delete the JobPosting.
-     */
     public function softDelete($id)
     {
         $jobPosting = JobPosting::findOrFail($id);
-
+    
         // Soft delete the job posting
         $jobPosting->delete();
-
+    
         return response()->json(['success' => true]);
     }
+    
 
     /**
      * Show the form for creating a new resource.

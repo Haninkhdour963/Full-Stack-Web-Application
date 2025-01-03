@@ -65,88 +65,49 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // Handle soft delete
-        document.querySelectorAll('.soft-delete-btn').forEach(button => {
-            button.addEventListener('click', async () => {
-                const jobBidId = button.getAttribute('data-id');
+  document.querySelectorAll('.soft-delete-btn').forEach(button => {
+    button.addEventListener('click', async () => {
+        const jobBidId = button.getAttribute('data-id');
 
-                // Display confirmation dialog
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: 'This action will soft delete the job bid!',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, soft delete it!',
-                }).then(async (result) => {
-                    if (result.isConfirmed) {
-                        try {
-                            const response = await fetch(`/admin/jobBids/${jobBidId}/soft-delete`, {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({ id: jobBidId }),
-                            });
-
-                            if (response.ok) {
-                                const data = await response.json();
-                                if (data.success) {
-                                    Swal.fire('Deleted!', 'Job bid has been soft deleted.', 'success');
-                                    const row = document.querySelector(`#jobBid-row-${jobBidId}`);
-                                    row.classList.add('text-muted');
-                                    button.disabled = true;
-                                    button.innerText = 'Deleted';
-                                } else {
-                                    Swal.fire('Error', 'Failed to delete job bid.', 'error');
-                                }
-                            } else {
-                                Swal.fire('Error', 'Failed to communicate with the server.', 'error');
-                            }
-                        } catch (error) {
-                            Swal.fire('Error', 'Network error. Failed to communicate with the server.', 'error');
-                        }
-                    }
-                });
-            });
-        });
-
-        // Handle view button click
-        document.querySelectorAll('.view-btn').forEach(button => {
-            button.addEventListener('click', async () => {
-                const jobBidId = button.getAttribute('data-id');
-
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'This action will soft delete the job bid!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, soft delete it!',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
                 try {
-                    // Fetch job bid details
-                    const response = await fetch(`/admin/jobBids/${jobBidId}`);
+                    const response = await fetch(`/admin/jobBids/${jobBidId}/soft-delete`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ id: jobBidId }),
+                    });
 
                     if (response.ok) {
                         const data = await response.json();
-                        const jobBid = data.jobBid;
-
-                        // Show the details in a SweetAlert popup
-                        Swal.fire({
-                            title: `Job Bid #${jobBid.id}`,
-                            html: `
-                                <p><strong>Technician:</strong> ${jobBid.technician ? jobBid.technician.name : 'N/A'}</p>
-                                <p><strong>Job Posting:</strong> ${jobBid.job ? jobBid.job.title : 'N/A'}</p>
-                                <p><strong>Bid Amount:</strong> $${jobBid.bid_amount}</p>
-                                <p><strong>Status:</strong> ${jobBid.status}</p>
-                                <p><strong>Bid Date:</strong> ${jobBid.bid_date ? jobBid.bid_date : 'N/A'}</p>
-                                <p><strong>Message:</strong> ${jobBid.bid_message ?? 'N/A'}</p>
-                            `,
-                            showCloseButton: true,
-                            focusConfirm: false,
-                        });
+                        if (data.success) {
+                            Swal.fire('Deleted!', 'Job bid has been soft deleted.', 'success');
+                            const row = document.querySelector(`#jobBid-row-${jobBidId}`);
+                            row.classList.add('text-muted');
+                            button.disabled = true;
+                            button.innerText = 'Deleted';
+                        } else {
+                            Swal.fire('Error', 'Failed to delete job bid.', 'error');
+                        }
                     } else {
-                        Swal.fire('Error', 'Failed to fetch job bid details.', 'error');
+                        Swal.fire('Error', 'Failed to communicate with the server.', 'error');
                     }
                 } catch (error) {
                     Swal.fire('Error', 'Network error. Failed to communicate with the server.', 'error');
                 }
-            });
+            }
         });
     });
+});
+
 </script>
 @endpush
