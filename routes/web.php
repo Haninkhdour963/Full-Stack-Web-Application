@@ -155,11 +155,10 @@ Route::get('/admin/admins/{id}', [AdminAdminController::class, 'show']);
 Route::post('admins/{id}/softDelete', [AdminAdminController::class, 'softDelete'])->name('admin.admins.softDelete');
 Route::post('admins/{id}/restore', [AdminAdminController::class, 'restore'])->name('admin.admins.restore');
        
-        Route::resource('technicians', AdminTechnicianController::class)->names('admin.technicians');
-        Route::get('/admin/technicians/{id}', [AdminTechnicianController::class, 'show']);
-        Route::post('technicians/{id}/softDelete', [AdminTechnicianController::class, 'softDelete'])->name('admin.technicians.softDelete');
-        Route::post('technicians/{id}/restore', [AdminTechnicianController::class, 'restore'])->name('admin.technicians.restore');
-       
+Route::resource('technicians', AdminTechnicianController::class)->names('admin.technicians');
+Route::get('/admin/technicians/{id}', [AdminTechnicianController::class, 'show']);
+Route::post('technicians/{id}/softDelete', [AdminTechnicianController::class, 'softDelete'])->name('admin.technicians.softDelete');
+Route::post('technicians/{id}/restore', [AdminTechnicianController::class, 'restore'])->name('admin.technicians.restore');
        
         Route::resource('categories', AdminCategoryController::class)->names('admin.categories');
         Route::post('categories/{id}/soft-delete', [AdminCategoryController::class, 'softDelete'])->name('categories.softDelete');

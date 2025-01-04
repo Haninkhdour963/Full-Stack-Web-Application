@@ -13,13 +13,14 @@ class TechnicianController extends Controller
         $this->middleware('auth');
         $this->middleware('role:admin');
     }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         // Fetch technicians with pagination (10 technicians per page)
-    $technicians = Technician::withTrashed()->paginate(10);
+        $technicians = Technician::withTrashed()->paginate(10);
         return view('admin.technicians.index', compact('technicians'));
     }
 
@@ -37,19 +38,16 @@ class TechnicianController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Restore the technician.
      */
-    public function create()
+    public function restore($id)
     {
-        //
-    }
+        $technician = Technician::withTrashed()->findOrFail($id);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+        // Restore the technician
+        $technician->restore();
+
+        return response()->json(['success' => true]);
     }
 
     /**
@@ -57,12 +55,12 @@ class TechnicianController extends Controller
      */
     public function show($id)
     {
-        // جلب التفاصيل الخاصة بالفني بناءً على الـ ID
+        // Fetch technician details based on ID
         $technician = Technician::findOrFail($id);
-        
-        // إعادة البيانات بتنسيق JSON
+
+        // Return data in JSON format
         return response()->json([
-            'name' => $technician->name,  // افترض أن هناك حقل للاسم
+            'name' => $technician->name,
             'identity_number' => $technician->identity_number,
             'skills' => $technician->skills,
             'hourly_rate' => number_format($technician->hourly_rate, 2),
@@ -73,32 +71,4 @@ class TechnicianController extends Controller
             'available_from' => $technician->available_from,
         ]);
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
-
-
- 
-
 }

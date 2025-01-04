@@ -33,9 +33,9 @@
                                     <td>
                                         <button class="btn btn-info btn-sm view-btn" data-id="{{ $technician->id }}">View</button>
                                         @if($technician->deleted_at)
-                                            <button class="btn btn-danger btn-sm" disabled>Deleted</button>
+                                            <button class="btn btn-success btn-sm action-btn" data-id="{{ $technician->id }}" data-action="restore">Restore</button>
                                         @else
-                                            <button class="btn btn-danger btn-sm soft-delete-btn" data-id="{{ $technician->id }}">Delete</button>
+                                            <button class="btn btn-danger btn-sm action-btn" data-id="{{ $technician->id }}" data-action="delete">Delete</button>
                                         @endif
                                     </td>
                                 </tr>
@@ -57,45 +57,73 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Soft delete button
-        document.querySelectorAll('.soft-delete-btn').forEach(button => {
-            button.addEventListener('click', async () => {
-                const technicianId = button.getAttribute('data-id');
+        // Function to handle actions (delete/restore)
+        const handleAction = async (technicianId, action) => {
+            const url = action === 'delete' 
+                ? `/admin/technicians/${technicianId}/softDelete` 
+                : `/admin/technicians/${technicianId}/restore`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: `${action === 'delete' ? 'Deleted!' : 'Restored!'}`,
+                            text: `Technician has been ${action === 'delete' ? 'soft deleted.' : 'restored.'}`,
+                        });
+
+                        // Update the button and row dynamically
+                        const row = document.querySelector(`#technician-row-${technicianId}`);
+                        const button = row.querySelector('.action-btn');
+
+                        if (action === 'delete') {
+                            row.classList.add('text-muted');
+                            button.innerText = 'Restore';
+                            button.classList.remove('btn-danger');
+                            button.classList.add('btn-success');
+                            button.setAttribute('data-action', 'restore');
+                        } else {
+                            row.classList.remove('text-muted');
+                            button.innerText = 'Delete';
+                            button.classList.remove('btn-success');
+                            button.classList.add('btn-danger');
+                            button.setAttribute('data-action', 'delete');
+                        }
+                    } else {
+                        Swal.fire('Error', `Failed to ${action} technician.`, 'error');
+                    }
+                } else {
+                    Swal.fire('Error', 'Failed to communicate with the server.', 'error');
+                }
+            } catch (error) {
+                Swal.fire('Error', 'Network error. Failed to communicate with the server.', 'error');
+            }
+        };
+
+        // Attach event listeners to action buttons
+        document.querySelectorAll('.action-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const technicianId = this.getAttribute('data-id');
+                const action = this.getAttribute('data-action');
 
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: 'This action will soft delete the technician!',
+                    text: `This action will ${action === 'delete' ? 'soft delete' : 'restore'} the technician!`,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: 'Yes, soft delete it!',
-                }).then(async (result) => {
+                    confirmButtonText: `Yes, ${action === 'delete' ? 'delete' : 'restore'} it!`,
+                }).then((result) => {
                     if (result.isConfirmed) {
-                        try {
-                            const response = await fetch(`/admin/technicians/${technicianId}/soft-delete`, {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                                    'Content-Type': 'application/json',
-                                }
-                            });
-
-                            if (response.ok) {
-                                const data = await response.json();
-                                if (data.success) {
-                                    Swal.fire('Deleted!', 'Technician has been soft deleted.', 'success');
-                                    const row = document.querySelector(`#technician-row-${technicianId}`);
-                                    row.classList.add('text-muted');
-                                    button.disabled = true;
-                                    button.innerText = 'Deleted';
-                                } else {
-                                    Swal.fire('Error', 'Failed to delete technician.', 'error');
-                                }
-                            } else {
-                                Swal.fire('Error', 'Failed to communicate with the server.', 'error');
-                            }
-                        } catch (error) {
-                            Swal.fire('Error', 'Network error. Failed to communicate with the server.', 'error');
-                        }
+                        handleAction(technicianId, action);
                     }
                 });
             });
