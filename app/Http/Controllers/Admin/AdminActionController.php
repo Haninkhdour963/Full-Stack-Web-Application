@@ -51,27 +51,26 @@ class AdminActionController extends Controller
             'data' => $adminAction
         ]);
     }
-
-    // Update - Edit an existing admin action
     public function update(Request $request, $id)
     {
-        $validatedData = $request->validate([
-            'admin_id' => 'required|exists:admins,id',
-            'action_type' => 'required|in:ban_user,approve_profile,resolve_dispute',
+        $request->validate([
+            'action_type' => 'required|string',
             'description' => 'required|string',
             'target_user_id' => 'required|exists:users,id',
         ]);
-
+    
         $adminAction = AdminAction::findOrFail($id);
-        $adminAction->update($validatedData);
-
+        $adminAction->update([
+            'action_type' => $request->input('action_type'),
+            'description' => $request->input('description'),
+            'target_user_id' => $request->input('target_user_id'),
+        ]);
+    
         return response()->json([
             'success' => true,
             'message' => 'Admin action updated successfully.',
-            'data' => $adminAction
         ]);
     }
-
     // Soft Delete - Soft delete an admin action
     public function softDelete($id)
     {

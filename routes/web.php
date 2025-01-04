@@ -213,10 +213,7 @@ Route::post('jobBids/{id}/restore', [AdminJobBidController::class, 'restore'])->
         Route::post('adminActions/{id}/soft-delete', [AdminAdminActionController::class, 'softDelete'])->name('admin.adminActions.softDelete');
         Route::post('adminActions/{id}/restore', [AdminAdminActionController::class, 'restore'])->name('admin.adminActions.restore');
         Route::post('adminActions/{id}', [AdminAdminActionController::class, 'update'])->name('admin.adminActions.update');
-    
-    
-    
-    
+        
     
     });
 
