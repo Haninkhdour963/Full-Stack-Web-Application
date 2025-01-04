@@ -34,11 +34,9 @@
                                     </td>
                                     <td>
                                         <button class="btn btn-primary btn-sm view-btn" data-id="{{ $dispute->id }}">View</button>
-                                        @if($dispute->deleted_at)
-                                            <button class="btn btn-success btn-sm restore-btn" data-id="{{ $dispute->id }}">Restore</button>
-                                        @else
-                                            <button class="btn btn-danger btn-sm soft-delete-btn" data-id="{{ $dispute->id }}">Soft Delete</button>
-                                        @endif
+                                        <button class="btn {{ $dispute->deleted_at ? 'btn-success' : 'btn-danger' }} btn-sm toggle-delete-btn" data-id="{{ $dispute->id }}">
+                                            {{ $dispute->deleted_at ? 'Restore' : 'Soft Delete' }}
+                                        </button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -70,10 +68,10 @@
     </div>
 </div>
 
-                <!-- Pagination Links -->
-                <div class="d-flex justify-content-center">
-                    {{ $disputes->links('vendor.pagination.custom') }}  <!-- This generates the pagination links -->
-                </div>
+<!-- Pagination Links -->
+<div class="d-flex justify-content-center">
+    {{ $disputes->links('vendor.pagination.custom') }}  <!-- This generates the pagination links -->
+</div>
 @endsection
 
 @push('scripts')
@@ -114,21 +112,25 @@
             });
         });
 
-        // Soft Delete Button Logic
-        document.querySelectorAll('.soft-delete-btn').forEach(button => {
+        // Toggle Delete/Restore Button Logic
+        document.querySelectorAll('.toggle-delete-btn').forEach(button => {
             button.addEventListener('click', async () => {
                 const disputeId = button.getAttribute('data-id');
+                const isDeleted = button.classList.contains('btn-success'); // Check if the button is in "Restore" mode
+
+                const action = isDeleted ? 'restore' : 'softDelete';
+                const actionText = isDeleted ? 'restore' : 'soft delete';
 
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: 'This action will soft delete the dispute!',
+                    text: `This action will ${actionText} the dispute!`,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: 'Yes, soft delete it!',
+                    confirmButtonText: `Yes, ${actionText} it!`,
                 }).then(async (result) => {
                     if (result.isConfirmed) {
                         try {
-                            const response = await fetch(`/admin/disputes/${disputeId}/softDelete`, {
+                            const response = await fetch(`/admin/disputes/${disputeId}/${action}`, {
                                 method: 'POST',
                                 headers: {
                                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -139,57 +141,28 @@
                             if (response.ok) {
                                 const data = await response.json();
                                 if (data.success) {
-                                    Swal.fire('Deleted!', 'Dispute has been soft deleted.', 'success');
+                                    Swal.fire('Success!', `Dispute has been ${actionText}d.`, 'success');
+
+                                    // Update the button text and class
+                                    if (isDeleted) {
+                                        button.classList.remove('btn-success');
+                                        button.classList.add('btn-danger');
+                                        button.innerText = 'Soft Delete';
+                                    } else {
+                                        button.classList.remove('btn-danger');
+                                        button.classList.add('btn-success');
+                                        button.innerText = 'Restore';
+                                    }
+
+                                    // Update the row styling
                                     const row = document.querySelector(`#dispute-row-${disputeId}`);
-                                    row.classList.add('text-muted');
-                                    button.disabled = true;
-                                    button.innerText = 'Deleted';
+                                    if (isDeleted) {
+                                        row.classList.remove('text-muted');
+                                    } else {
+                                        row.classList.add('text-muted');
+                                    }
                                 } else {
-                                    Swal.fire('Error', 'Failed to delete dispute.', 'error');
-                                }
-                            } else {
-                                Swal.fire('Error', 'Failed to communicate with the server.', 'error');
-                            }
-                        } catch (error) {
-                            Swal.fire('Error', 'Network error. Failed to communicate with the server.', 'error');
-                        }
-                    }
-                });
-            });
-        });
-
-        // Restore Button Logic
-        document.querySelectorAll('.restore-btn').forEach(button => {
-            button.addEventListener('click', async () => {
-                const disputeId = button.getAttribute('data-id');
-
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: 'This action will restore the soft deleted dispute!',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, restore it!',
-                }).then(async (result) => {
-                    if (result.isConfirmed) {
-                        try {
-                            const response = await fetch(`/admin/disputes/${disputeId}/restore`, {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                                    'Content-Type': 'application/json',
-                                }
-                            });
-
-                            if (response.ok) {
-                                const data = await response.json();
-                                if (data.success) {
-                                    Swal.fire('Restored!', 'Dispute has been restored.', 'success');
-                                    const row = document.querySelector(`#dispute-row-${disputeId}`);
-                                    row.classList.remove('text-muted');
-                                    button.disabled = true;
-                                    button.innerText = 'Restored';
-                                } else {
-                                    Swal.fire('Error', 'Failed to restore dispute.', 'error');
+                                    Swal.fire('Error', `Failed to ${actionText} dispute.`, 'error');
                                 }
                             } else {
                                 Swal.fire('Error', 'Failed to communicate with the server.', 'error');

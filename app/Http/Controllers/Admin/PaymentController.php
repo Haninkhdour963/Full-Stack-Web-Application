@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 class PaymentController extends Controller
 {
     public function __construct() {
-
         $this->middleware('auth');
         $this->middleware('role:admin');
     }
@@ -19,9 +18,9 @@ class PaymentController extends Controller
      */
     public function index()
     {
-        // Paginate Payments with related job and client and technician data
-        $payments = Payment::with(['job', 'client', 'technician'])->paginate(15);
-    
+        // Paginate Payments with related job, client, and technician data
+        $payments = Payment::with(['job', 'technician.user'])->paginate(15);
+
         return view('admin.payments.index', compact('payments'));
     }
 

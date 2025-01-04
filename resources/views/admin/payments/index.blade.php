@@ -27,7 +27,6 @@
                                 <th>Amount</th>
                                 <th>Payment Date</th>
                                 <th>Job</th>
-                                <th>Client</th>
                                 <th>Technician</th>
                             </tr>
                         </thead>
@@ -43,9 +42,8 @@
                                             N/A
                                         @endif
                                     </td>
-                                    <td>{{ $payment->job ? $payment->job->name : 'N/A' }}</td>
-                                    <td>{{ $payment->client ? $payment->client->name : 'N/A' }}</td>
-                                    <td>{{ $payment->technician ? $payment->technician->name : 'N/A' }}</td>
+                                    <td>{{ $payment->job ? $payment->job->title : 'N/A' }}</td>
+                                    <td>{{ $payment->technician ? $payment->technician->user->name : 'N/A' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

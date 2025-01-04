@@ -66,4 +66,11 @@ class CategoryController extends Controller
 
         return response()->json(['success' => true]);
     }
+    public function restore($id)
+{
+    $category = Category::withTrashed()->findOrFail($id);
+    $category->restore();
+
+    return response()->json(['success' => true]);
+}
 }

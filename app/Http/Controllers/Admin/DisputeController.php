@@ -19,8 +19,8 @@ class DisputeController extends Controller
      */
     public function index()
     {
-           // Fetch disputes with pagination (10 per page, you can change this number)
-    $disputes = Dispute::withTrashed()->paginate(10); // Paginate disputes
+        // Fetch disputes with pagination (10 per page, you can change this number)
+        $disputes = Dispute::withTrashed()->paginate(10); // Paginate disputes
         return view('admin.disputes.index', compact('disputes'));
     }
 

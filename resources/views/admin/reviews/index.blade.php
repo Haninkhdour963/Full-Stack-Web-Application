@@ -39,11 +39,11 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if($review->deleted_at)
-                                            <button class="btn btn-success btn-sm restore-btn" data-id="{{ $review->id }}">Restore</button>
-                                        @else
-                                            <button class="btn btn-danger btn-sm soft-delete-btn" data-id="{{ $review->id }}">Soft Delete</button>
-                                        @endif
+                                        <button class="btn {{ $review->deleted_at ? 'btn-success' : 'btn-danger' }} btn-sm toggle-delete-btn"
+                                                data-id="{{ $review->id }}"
+                                                data-status="{{ $review->deleted_at ? 'deleted' : 'active' }}">
+                                            {{ $review->deleted_at ? 'Restore' : 'Soft Delete' }}
+                                        </button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -64,20 +64,23 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.soft-delete-btn').forEach(button => {
+        document.querySelectorAll('.toggle-delete-btn').forEach(button => {
             button.addEventListener('click', async () => {
                 const reviewId = button.getAttribute('data-id');
+                const status = button.getAttribute('data-status');
+                const action = status === 'deleted' ? 'restore' : 'softDelete';
+                const url = `/admin/reviews/${reviewId}/${action}`;
 
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: 'This action will soft delete the review!',
+                    text: `This action will ${action === 'softDelete' ? 'soft delete' : 'restore'} the review!`,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: 'Yes, soft delete it!',
+                    confirmButtonText: `Yes, ${action === 'softDelete' ? 'soft delete' : 'restore'} it!`,
                 }).then(async (result) => {
                     if (result.isConfirmed) {
                         try {
-                            const response = await fetch(`/admin/reviews/${reviewId}/softDelete`, {
+                            const response = await fetch(url, {
                                 method: 'POST',
                                 headers: {
                                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -88,56 +91,26 @@
                             if (response.ok) {
                                 const data = await response.json();
                                 if (data.success) {
-                                    Swal.fire('Deleted!', 'Review has been soft deleted.', 'success');
+                                    Swal.fire('Success!', `Review has been ${action === 'softDelete' ? 'soft deleted' : 'restored'}.`, 'success');
+                                    
+                                    // Toggle button text and status
+                                    const newStatus = status === 'deleted' ? 'active' : 'deleted';
+                                    button.setAttribute('data-status', newStatus);
+                                    button.innerText = newStatus === 'deleted' ? 'Restore' : 'Soft Delete';
+                                    button.classList.toggle('btn-danger');
+                                    button.classList.toggle('btn-success');
+
+                                    // Update row styling
                                     const row = document.querySelector(`#review-row-${reviewId}`);
-                                    row.classList.add('text-muted');
-                                    button.disabled = true;
-                                    button.innerText = 'Deleted';
+                                    row.classList.toggle('text-muted');
+
+                                    // Update status badge
+                                    const statusBadge = row.querySelector('td:nth-child(7) span');
+                                    statusBadge.innerText = newStatus === 'deleted' ? 'Deleted' : 'Active';
+                                    statusBadge.classList.toggle('badge-danger');
+                                    statusBadge.classList.toggle('badge-success');
                                 } else {
-                                    Swal.fire('Error', 'Failed to delete review.', 'error');
-                                }
-                            } else {
-                                Swal.fire('Error', 'Failed to communicate with the server.', 'error');
-                            }
-                        } catch (error) {
-                            Swal.fire('Error', 'Network error. Failed to communicate with the server.', 'error');
-                        }
-                    }
-                });
-            });
-        });
-
-        document.querySelectorAll('.restore-btn').forEach(button => {
-            button.addEventListener('click', async () => {
-                const reviewId = button.getAttribute('data-id');
-
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: 'This action will restore the soft deleted review!',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, restore it!',
-                }).then(async (result) => {
-                    if (result.isConfirmed) {
-                        try {
-                            const response = await fetch(`/admin/reviews/${reviewId}/restore`, {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                                    'Content-Type': 'application/json',
-                                }
-                            });
-
-                            if (response.ok) {
-                                const data = await response.json();
-                                if (data.success) {
-                                    Swal.fire('Restored!', 'Review has been restored.', 'success');
-                                    const row = document.querySelector(`#review-row-${reviewId}`);
-                                    row.classList.remove('text-muted');
-                                    button.disabled = true;
-                                    button.innerText = 'Restored';
-                                } else {
-                                    Swal.fire('Error', 'Failed to restore review.', 'error');
+                                    Swal.fire('Error', 'Failed to update review status.', 'error');
                                 }
                             } else {
                                 Swal.fire('Error', 'Failed to communicate with the server.', 'error');

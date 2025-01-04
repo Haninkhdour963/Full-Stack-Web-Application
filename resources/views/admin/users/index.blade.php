@@ -16,7 +16,7 @@
                                 <th>Username</th>
                                 <th>Email</th>
                                 <th>Role</th>
-                                <th>Profile Image</th> <!-- إضافة عمود الصورة -->
+                                <th>Profile Image</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -28,7 +28,6 @@
                                     <td>{{ $user->email }}</td>
                                     <td>{{ ucfirst($user->user_role) }}</td>
                                     <td>
-                                        <!-- عرض صورة المستخدم إذا كانت موجودة -->
                                         @if($user->profile_image)
                                             <img src="{{ asset('storage/' . $user->profile_image) }}" alt="Profile Image" style="width: 50px; height: 50px; object-fit: cover;">
                                         @else
@@ -37,7 +36,7 @@
                                     </td>
                                     <td>
                                         @if($user->deleted_at)
-                                            <button class="btn btn-danger btn-sm" disabled>Deleted</button>
+                                            <button class="btn btn-success btn-sm restore-btn" data-id="{{ $user->id }}">Restore</button>
                                         @else
                                             <button class="btn btn-info btn-sm view-btn" data-id="{{ $user->id }}">View</button>
                                             <button class="btn btn-danger btn-sm soft-delete-btn" data-id="{{ $user->id }}">Delete</button>
@@ -103,7 +102,7 @@
                 }).then(async (result) => {
                     if (result.isConfirmed) {
                         try {
-                            const response = await fetch(`/admin/users/${userId}/soft-delete`, {
+                            const response = await fetch(`/admin/users/${userId}/softDelete`, {
                                 method: 'POST',
                                 headers: {
                                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -119,6 +118,14 @@
                                     row.classList.add('text-muted');
                                     button.disabled = true;
                                     button.innerText = 'Deleted';
+
+                                    // Replace the "Delete" button with a "Restore" button
+                                    const restoreButton = document.createElement('button');
+                                    restoreButton.className = 'btn btn-success btn-sm restore-btn';
+                                    restoreButton.setAttribute('data-id', userId);
+                                    restoreButton.innerText = 'Restore';
+                                    restoreButton.addEventListener('click', () => handleRestore(userId));
+                                    button.replaceWith(restoreButton);
                                 } else {
                                     Swal.fire('Error', 'Failed to delete user.', 'error');
                                 }
@@ -132,6 +139,57 @@
                 });
             });
         });
+
+        // Handle restore button click
+        document.querySelectorAll('.restore-btn').forEach(button => {
+            button.addEventListener('click', () => handleRestore(button.getAttribute('data-id')));
+        });
+
+        // Function to handle restore
+        const handleRestore = async (userId) => {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'This action will restore the user!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, restore it!',
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`/admin/users/${userId}/restore`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                'Content-Type': 'application/json',
+                            }
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success) {
+                                Swal.fire('Restored!', 'User has been restored.', 'success');
+                                const row = document.querySelector(`#user-row-${userId}`);
+                                row.classList.remove('text-muted');
+
+                                // Replace the "Restore" button with a "Delete" button
+                                const deleteButton = document.createElement('button');
+                                deleteButton.className = 'btn btn-danger btn-sm soft-delete-btn';
+                                deleteButton.setAttribute('data-id', userId);
+                                deleteButton.innerText = 'Delete';
+                                deleteButton.addEventListener('click', () => handleSoftDelete(userId));
+                                row.querySelector('.restore-btn').replaceWith(deleteButton);
+                            } else {
+                                Swal.fire('Error', 'Failed to restore user.', 'error');
+                            }
+                        } else {
+                            Swal.fire('Error', 'Failed to communicate with the server.', 'error');
+                        }
+                    } catch (error) {
+                        Swal.fire('Error', 'Network error. Failed to communicate with the server.', 'error');
+                    }
+                }
+            });
+        };
 
         // Handle view button click
         document.querySelectorAll('.view-btn').forEach(button => {

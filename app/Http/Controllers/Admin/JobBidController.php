@@ -9,31 +9,20 @@ use Illuminate\Http\Request;
 class JobBidController extends Controller
 {
     public function __construct() {
-
         $this->middleware('auth');
         $this->middleware('role:admin');
-      
     }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-       // Paginate JobBids, 10 per page (you can adjust the number as needed)
-    $jobBids = JobBid::with(['job', 'technician'])->withTrashed()->paginate(10);
+        // Paginate JobBids, 10 per page (you can adjust the number as needed)
+        $jobBids = JobBid::with(['job', 'technician'])->withTrashed()->paginate(10);
         return view('admin.jobBids.index', compact('jobBids'));
     }
 
-    public function softDelete($id)
-    {
-        $jobBid = JobBid::findOrFail($id);
-    
-        // Soft delete the JobBid
-        $jobBid->delete();
-    
-        return response()->json(['success' => true]);
-    }
-    
     /**
      * Show the details of a specific JobBid.
      */
@@ -49,46 +38,22 @@ class JobBidController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Soft delete the job bid.
      */
-    public function create()
+    public function softDelete($id)
     {
-        //
+        $jobBid = JobBid::findOrFail($id);
+        $jobBid->delete(); // Soft delete the JobBid
+        return response()->json(['success' => true]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Restore the soft-deleted JobBid.
      */
-    public function store(Request $request)
+    public function restore($id)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-   
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $jobBid = JobBid::withTrashed()->findOrFail($id);
+        $jobBid->restore(); // Restore the soft-deleted JobBid
+        return response()->json(['success' => true]);
     }
 }

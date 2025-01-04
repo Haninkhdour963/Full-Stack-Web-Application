@@ -121,7 +121,9 @@ class StripePaymentController extends Controller
                 'updated_at' => now()
             ]);
 
-            return back()->with('success', 'Payment successful!');
+            // return back()->with('success', 'Payment successful!');
+            return redirect()->route('client.contacts.index')->with('success', 'Payment successful!');
+       
 
         } catch (\Exception $e) {
             $failedTransactionId = 'failed_' . Str::uuid();

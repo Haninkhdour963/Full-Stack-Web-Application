@@ -4,43 +4,76 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
-use App\Models\User;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         $this->middleware('auth');
         $this->middleware('role:admin');
     }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-         // Fetch admins with pagination (10 admins per page, you can change the number as needed)
-         $admins = User::withTrashed()->where('user_role', 'admin')->paginate(8);
-        
+        // Fetch admins with pagination (8 admins per page)
+        $admins = Admin::withTrashed()->paginate(8);
         return view('admin.admins.index', compact('admins'));
     }
 
-     // Soft delete a user
-   public function softDelete($id)
-   {
-       try {
-           $user = User::findOrFail($id);  // Find the user by ID
+    /**
+     * Soft delete an admin.
+     */
+    public function softDelete($id)
+    {
+        try {
+            $admin = Admin::findOrFail($id);
 
-           if ($user->deleted_at) {
-               return response()->json(['error' => 'User already deleted.'], 400);
-           }
+            if ($admin->deleted_at) {
+                return response()->json(['error' => 'Admin already deleted.'], 400);
+            }
 
-           $user->delete();  // Perform the soft delete
+            $admin->delete(); // Soft delete
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete admin. ' . $e->getMessage()], 500);
+        }
+    }
 
-           return response()->json(['success' => true]);
-       } catch (\Exception $e) {
-           return response()->json(['error' => 'Failed to delete user. ' . $e->getMessage()], 500);
-       }
-   }
+    /**
+     * Restore a soft-deleted admin.
+     */
+    public function restore($id)
+    {
+        try {
+            $admin = Admin::withTrashed()->findOrFail($id);
+
+            if (!$admin->deleted_at) {
+                return response()->json(['error' => 'Admin is not deleted.'], 400);
+            }
+
+            $admin->restore(); // Restore
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to restore admin. ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Display the specified admin.
+     */
+    public function show($id)
+    {
+        try {
+            $admin = Admin::withTrashed()->findOrFail($id);
+            return response()->json(['success' => true, 'admin' => $admin]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to fetch admin details. ' . $e->getMessage()], 500);
+        }
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -54,14 +87,6 @@ class AdminController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
     {
         //
     }

@@ -14,29 +14,25 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Job Posting</th>
-                                
                                 <th>Status</th>
                                 <th>Created At</th>
                                 <th>Updated At</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="escrowPaymentTableBody">
+                        <tbody>
                             @foreach($escrowPayments as $escrowPayment)
                                 <tr id="escrowPayment-row-{{ $escrowPayment->id }}" class="{{ $escrowPayment->deleted_at ? 'text-muted' : '' }}">
                                     <td>{{ $escrowPayment->id }}</td>
                                     <td>{{ $escrowPayment->job ? $escrowPayment->job->title : 'N/A' }}</td>
-                                    
                                     <td>{{ ucfirst($escrowPayment->status) }}</td>
                                     <td>{{ $escrowPayment->created_at ? $escrowPayment->created_at->format('Y-m-d H:i:s') : 'N/A' }}</td>
                                     <td>{{ $escrowPayment->updated_at ? $escrowPayment->updated_at->format('Y-m-d H:i:s') : 'N/A' }}</td>
                                     <td>
-                                        <button class="btn btn-info btn-sm view-btn" data-id="{{ $escrowPayment->id }}">View</button>
-                                        @if($escrowPayment->deleted_at)
-                                            <button class="btn btn-danger btn-sm" disabled>Deleted</button>
-                                        @else
-                                            <button class="btn btn-danger btn-sm soft-delete-btn" data-id="{{ $escrowPayment->id }}">Soft Delete</button>
-                                        @endif
+                                        <button class="btn btn-primary btn-sm view-btn" data-id="{{ $escrowPayment->id }}">View</button>
+                                        <button class="btn {{ $escrowPayment->deleted_at ? 'btn-success' : 'btn-danger' }} btn-sm toggle-delete-btn" data-id="{{ $escrowPayment->id }}">
+                                            {{ $escrowPayment->deleted_at ? 'Restore' : 'Soft Delete' }}
+                                        </button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -56,69 +52,123 @@
                 <h5 class="modal-title" id="escrowPaymentModalLabel">Escrow Payment Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
             <div class="modal-body">
                 <div id="escrowPaymentDetails">
-                    <!-- Details will be populated here -->
+                    <!-- Dynamic content will be populated here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <!-- Pagination Links -->
 <div class="d-flex justify-content-center">
-                    {{ $escrowPayments->links('vendor.pagination.custom') }}  <!-- This generates the pagination links -->
-                </div>
+    {{ $escrowPayments->links('vendor.pagination.custom') }}  <!-- This generates the pagination links -->
+</div>
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    // Handle soft delete button click (unchanged)
-    document.querySelectorAll('.soft-delete-btn').forEach(button => {
-        button.addEventListener('click', async () => {
-            // Soft delete logic
-        });
-    });
+    document.addEventListener('DOMContentLoaded', () => {
+        // View Button Logic - Show Modal with Escrow Payment Details
+        document.querySelectorAll('.view-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const escrowPaymentId = button.getAttribute('data-id');
 
-    // Handle view button click
-    document.querySelectorAll('.view-btn').forEach(button => {
-        button.addEventListener('click', async () => {
-            const escrowPaymentId = button.getAttribute('data-id');
+                try {
+                    const response = await fetch(`/admin/escrowPayments/${escrowPaymentId}/view`);
+                    if (response.ok) {
+                        const escrowPayment = await response.json();
+                        let escrowPaymentDetails = `
+                            <p><strong>ID:</strong> ${escrowPayment.data.id}</p>
+                            <p><strong>Job Posting:</strong> ${escrowPayment.data.job}</p>
+                            <p><strong>Technician:</strong> ${escrowPayment.data.technician}</p>
+                            <p><strong>Client:</strong> ${escrowPayment.data.client}</p>
+                            <p><strong>Status:</strong> ${escrowPayment.data.status}</p>
+                            <p><strong>Created At:</strong> ${escrowPayment.data.created_at}</p>
+                            <p><strong>Updated At:</strong> ${escrowPayment.data.updated_at}</p>
+                        `;
 
-            try {
-                const response = await fetch(`/admin/escrowPayments/${escrowPaymentId}/view`);
-                const data = await response.json();
+                        document.getElementById('escrowPaymentDetails').innerHTML = escrowPaymentDetails;
 
-                if (data.success) {
-                    const escrowPayment = data.data;
-
-                    // Populate modal with escrow payment details
-                    let detailsHtml = `
-                        <p><strong>Escrow Payment ID:</strong> ${escrowPayment.id}</p>
-                        <p><strong>Job Posting:</strong> ${escrowPayment.job ? escrowPayment.job.title : 'N/A'}</p>
-                        <p><strong>Client:</strong> ${escrowPayment.client ? escrowPayment.client.username : 'N/A'}</p>
-                        <p><strong>Technician:</strong> ${escrowPayment.technician ? escrowPayment.technician.username : 'N/A'}</p>
-                        <p><strong>Amount Min:</strong> $${escrowPayment.amount_min}</p>
-                        <p><strong>Amount Max:</strong> $${escrowPayment.amount_max}</p>
-                        <p><strong>Status:</strong> ${escrowPayment.status}</p>
-                        <p><strong>Created At:</strong> ${escrowPayment.created_at}</p>
-                        <p><strong>Updated At:</strong> ${escrowPayment.updated_at}</p>
-                    `;
-
-                    document.getElementById('escrowPaymentDetails').innerHTML = detailsHtml;
-
-                    // Show modal
-                    $('#escrowPaymentModal').modal('show');
-                } else {
-                    Swal.fire('Error', 'Failed to fetch escrow payment details.', 'error');
+                        // Show the modal using Bootstrap
+                        var modal = new bootstrap.Modal(document.getElementById('escrowPaymentModal'));
+                        modal.show();
+                    } else {
+                        Swal.fire('Error', 'Failed to fetch escrow payment details.', 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Error', 'Network error. Failed to fetch details.', 'error');
                 }
-            } catch (error) {
-                Swal.fire('Error', 'Network error. Failed to fetch details.', 'error');
-            }
+            });
+        });
+
+        // Toggle Delete/Restore Button Logic
+        document.querySelectorAll('.toggle-delete-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const escrowPaymentId = button.getAttribute('data-id');
+                const isDeleted = button.classList.contains('btn-success'); // Check if the button is in "Restore" mode
+
+                const action = isDeleted ? 'restore' : 'softDelete';
+                const actionText = isDeleted ? 'restore' : 'soft delete';
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: `This action will ${actionText} the escrow payment!`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: `Yes, ${actionText} it!`,
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        try {
+                            const response = await fetch(`/admin/escrowPayments/${escrowPaymentId}/${action}`, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                    'Content-Type': 'application/json',
+                                }
+                            });
+
+                            if (response.ok) {
+                                const data = await response.json();
+                                if (data.success) {
+                                    Swal.fire('Success!', `Escrow Payment has been ${actionText}d.`, 'success');
+
+                                    // Update the button text and class
+                                    if (isDeleted) {
+                                        button.classList.remove('btn-success');
+                                        button.classList.add('btn-danger');
+                                        button.innerText = 'Soft Delete';
+                                    } else {
+                                        button.classList.remove('btn-danger');
+                                        button.classList.add('btn-success');
+                                        button.innerText = 'Restore';
+                                    }
+
+                                    // Update the row styling
+                                    const row = document.querySelector(`#escrowPayment-row-${escrowPaymentId}`);
+                                    if (isDeleted) {
+                                        row.classList.remove('text-muted');
+                                    } else {
+                                        row.classList.add('text-muted');
+                                    }
+                                } else {
+                                    Swal.fire('Error', `Failed to ${actionText} escrow payment.`, 'error');
+                                }
+                            } else {
+                                Swal.fire('Error', 'Failed to communicate with the server.', 'error');
+                            }
+                        } catch (error) {
+                            Swal.fire('Error', 'Network error. Failed to communicate with the server.', 'error');
+                        }
+                    }
+                });
+            });
         });
     });
-});
 </script>
 @endpush

@@ -105,30 +105,34 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-            <form id="updateUserForm">
-    <input type="hidden" id="updateUserId" name="id">
-    <div class="mb-3">
-        <label for="updateUserName" class="form-label">Name</label>
-        <input type="text" class="form-control" id="updateUserName" name="name" required>
-    </div>
-    <div class="mb-3">
-        <label for="updateUserEmail" class="form-label">Email</label>
-        <input type="email" class="form-control" id="updateUserEmail" name="email" required>
-    </div>
-    <!-- <div class="mb-3">
-        <label for="updateUserRole" class="form-label">Role</label>
-        <select class="form-select" id="updateUserRole" name="user_role" required>
-           
-            <option value="client">Client</option>
-        
-        </select>
-    </div> -->
-    <div class="mb-3">
-        <label for="updateUserPassword" class="form-label">Password</label>
-        <input type="password" class="form-control" id="updateUserPassword" name="password">
-    </div>
-    <button type="submit" class="btn btn-primary">Update</button>
-</form>
+                <form id="updateUserForm">
+                    <input type="hidden" id="updateUserId" name="id">
+                    <div class="mb-3">
+                        <label for="updateUserName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="updateUserName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="updateUserEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="updateUserEmail" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="updateUserProfileImage" class="form-label">Profile Image</label>
+                        <input type="text" class="form-control" id="updateUserProfileImage" name="profile_image">
+                    </div>
+                    <div class="mb-3">
+                        <label for="updateUserPhoneNumber" class="form-label">Phone Number</label>
+                        <input type="text" class="form-control" id="updateUserPhoneNumber" name="phone_number">
+                    </div>
+                    <div class="mb-3">
+                        <label for="updateUserMobilePhone" class="form-label">Mobile Phone</label>
+                        <input type="text" class="form-control" id="updateUserMobilePhone" name="mobile_phone">
+                    </div>
+                    <div class="mb-3">
+                        <label for="updateUserLocation" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="updateUserLocation" name="location">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </form>
             </div>
         </div>
     </div>
@@ -209,50 +213,53 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('updateUserId').value = user.id;
             document.getElementById('updateUserName').value = user.name;
             document.getElementById('updateUserEmail').value = user.email;
-        //    //
+            document.getElementById('updateUserProfileImage').value = user.profile_image || '';
+            document.getElementById('updateUserPhoneNumber').value = user.phone_number || '';
+            document.getElementById('updateUserMobilePhone').value = user.mobile_phone || '';
+            document.getElementById('updateUserLocation').value = user.location || '';
 
             $('#updateUserModal').modal('show');
         });
     });
 
     // Handle Update Form Submission
-   // Handle Update Form Submission
-document.getElementById('updateUserForm').addEventListener('submit', async (event) => {
-    event.preventDefault();
+    document.getElementById('updateUserForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
 
-    const formData = new FormData(event.target);
-    const userId = formData.get('id');
+        const formData = new FormData(event.target);
+        const userId = formData.get('id');
 
-    try {
-        const response = await fetch(`/client/users/${userId}`, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Accept': 'application/json', // Ensure the server knows we expect JSON
-            },
-            body: formData, // Send FormData directly
-        });
+        try {
+            const response = await fetch(`/client/users/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                },
+                body: formData,
+            });
 
-        const result = await response.json(); // Parse the JSON response
+            const result = await response.json();
 
-        if (response.ok) {
-            Swal.fire('Success', 'User updated successfully', 'success');
-            $('#updateUserModal').modal('hide');
+            if (response.ok) {
+                Swal.fire('Success', 'User updated successfully', 'success');
+                $('#updateUserModal').modal('hide');
 
-            // Optionally, update the user row in the table without reloading the page
-            const userRow = document.getElementById(`user-row-${userId}`);
-            if (userRow) {
-                userRow.querySelector('td:nth-child(1)').textContent = formData.get('name');
-                userRow.querySelector('td:nth-child(2)').textContent = formData.get('email');
-                // Update other fields as needed
+                const userRow = document.getElementById(`user-row-${userId}`);
+                if (userRow) {
+                    userRow.querySelector('td:nth-child(1)').textContent = formData.get('name');
+                    userRow.querySelector('td:nth-child(2)').textContent = formData.get('email');
+                    userRow.querySelector('td:nth-child(4)').textContent = formData.get('phone_number');
+                    userRow.querySelector('td:nth-child(5)').textContent = formData.get('mobile_phone');
+                    userRow.querySelector('td:nth-child(6)').textContent = formData.get('location');
+                }
+            } else {
+                Swal.fire('Error', result.error || 'Failed to update user', 'error');
             }
-        } else {
-            Swal.fire('Error', result.error || 'Failed to update user', 'error');
+        } catch (error) {
+            Swal.fire('Error', 'Failed to communicate with the server', 'error');
         }
-    } catch (error) {
-        Swal.fire('Error', 'Failed to communicate with the server', 'error');
-    }
-});
+    });
 });
 </script>
 @endpush

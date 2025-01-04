@@ -43,7 +43,7 @@ class UserController extends Controller
     
     public function show($id)
     {
-        $user = User::findOrFail($id); // Get the user by ID
+        $user = User::withTrashed()->findOrFail($id); // Get the user by ID, including soft deleted
     
         // Return user data as JSON, including the profile image URL
         return response()->json([
@@ -55,6 +55,7 @@ class UserController extends Controller
             'phone_number' => $user->phone_number,
             'mobile_phone' => $user->mobile_phone,
             'profile_image' => asset('storage/' . $user->profile_image),  // Assuming images are stored in the 'storage' folder
+            'deleted_at' => $user->deleted_at,
         ]);
     }
     
@@ -89,6 +90,23 @@ class UserController extends Controller
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to delete user. ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function restore($id)
+    {
+        try {
+            $user = User::withTrashed()->findOrFail($id);
+
+            if (!$user->deleted_at) {
+                return response()->json(['error' => 'User is not deleted.'], 400);
+            }
+
+            $user->restore();
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to restore user. ' . $e->getMessage()], 500);
         }
     }
 }
