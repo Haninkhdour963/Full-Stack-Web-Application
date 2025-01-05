@@ -37,7 +37,7 @@
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Technician</a>
                 <div class="dropdown-menu rounded-0 m-0">
-                    <a href="{{ route('page.technicians.profile') }}" class="dropdown-item">Create Profile</a>
+                    <a href="{{ route('login') }}" class="dropdown-item">Create Profile</a>
                     <a href="{{ route('page.technicians.bid') }}" class="dropdown-item">Bids On Jobs</a>
                     <a href="{{ route('page.technicians.contract') }}" class="dropdown-item">Manage Contracts</a>
                 </div>

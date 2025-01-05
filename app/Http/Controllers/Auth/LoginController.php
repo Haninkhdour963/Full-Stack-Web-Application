@@ -27,6 +27,8 @@ class LoginController extends Controller
             $user = Auth::user();
             if ($user->isAdmin()) {
                 return redirect()->route('admin.dashboard');
+            }else{
+                Auth::logout();
             }
         }
 

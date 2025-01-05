@@ -70,7 +70,7 @@
                         <span class="text-truncate me-3"><i class="fa fa-user text-primary me-2"></i> {{ $job->client->name }}</span>
                         <span class="text-truncate me-3"><i class="fa fa-map-marker-alt text-primary me-2"></i> {{ $job->status }}</span>
                         <span class="text-truncate me-3"><i class="fa fa-map-marker-alt text-primary me-2"></i> {{ $job->location }}</span>
-                        <span class="text-truncate me-3"><i class="far fa-clock text-primary me-2"></i>{{ $job->duration }}</span>
+                        <span class="text-truncate me-3"><i class="far fa-clock text-primary me-2"></i>{{ $job->duration }} Days</span>
                         <span class="text-truncate me-0"><i class="far fa-money-bill-alt text-primary me-2"></i>JOD {{ number_format($job->budget_min, 2) }} - JOD {{ number_format($job->budget_max, 2) }}</span>
                     </div>
                 </div>

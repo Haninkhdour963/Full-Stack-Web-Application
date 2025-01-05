@@ -72,7 +72,7 @@
                             <td>${{ number_format($jobPost->budget_min, 2) }} - ${{ number_format($jobPost->budget_max, 2) }}</td>
                             <td>{{ ucfirst($jobPost->status) }}</td>
                             <td>
-                                {{ $jobPost->posted_at ? $jobPost->posted_at->format('M d, Y') : 'Not posted yet' }}
+                                {{ $jobPost->posted_at ? $jobPost->posted_at->format('M d, Y') :now()}}
                             </td>
                         </tr>
                     @endforeach

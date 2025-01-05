@@ -16,8 +16,8 @@
                                 <th>Location</th>
                                 <th>Budget</th>
                                 <th>Status</th>
-                                <th>Posted At</th>
-                                <th>Actions</th>
+                                <!-- <th>Posted At</th> -->
+                                <!-- <th>Actions</th> -->
                             </tr>
                         </thead>
                         <tbody id="jobPostingsTableBody">
@@ -39,7 +39,7 @@
                                             <span class="badge badge-secondary">Closed</span>
                                         @endif
                                     </td>
-                                    <td>{{ $jobPosting->posted_at ? $jobPosting->posted_at->format('Y-m-d H:i:s') : 'N/A' }}</td>
+                                    <!-- <td>{{ $jobPosting->posted_at ? $jobPosting->posted_at->format('Y-m-d H:i:s') : 'N/A' }}</td> -->
                                     <td>
                                         <button class="btn btn-info btn-sm view-btn" data-id="{{ $jobPosting->id }}">View</button>
                                        

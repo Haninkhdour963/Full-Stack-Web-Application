@@ -32,6 +32,8 @@ class ClientController extends Controller
     // Check if the user is authenticated
     if (!auth()->check()) {
         return redirect()->route('login')->with('error', 'You need to log in first!');
+    } else{
+        return redirect()->route('index')->with('error', 'You need to register as a client to create a job post.');
     }
 
     // Check if the user has the 'client' role
@@ -46,7 +48,10 @@ class ClientController extends Controller
         'category' => 'required|integer',
         'budgetMin' => 'required|numeric',
         'budgetMax' => 'required|numeric',
-        'skills' => 'required|string'
+        'duration' => 'required|string|max:255',
+        'skills' => 'required|string',
+       
+
     ]);
 
     // Save the job post into the database
@@ -58,6 +63,7 @@ class ClientController extends Controller
         'category_id' => $request->category,
         'budget_min' => $request->budgetMin,
         'budget_max' => $request->budgetMax,
+        'duration' => $request->duration,
         'skills' => $request->skills,
         'status' => 'open', // Default status (assuming the job is open)
         'posted_at' => now(),

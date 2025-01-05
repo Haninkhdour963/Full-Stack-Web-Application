@@ -84,9 +84,9 @@
 
             <!-- Technician Details Start -->
             <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
-                <div class="card border-rounded" style="background-color: #ffffff;">
+                <div class="card border-rounded" style="background-color: #ffffff;text-align:center">
                     <h4 class="mb-4" style="color: #4A628A;">Technician Details</h4>
-                    <div class="d-flex align-items-center mb-3">
+                    <div class="d-flex align-items-center mb-3"style="justify-content: center;">
                         <img class="flex-shrink-0 rounded-circle" src="{{ $technician->user->profile_image ? asset('storage/' . $technician->user->profile_image) : asset('img/default-profile.jpg') }}" alt="" style="width: 50px; height: 50px;">
                         <div class="ms-3">
                             <h5 class="mb-0" style="color: #4A628A;">{{ $technician->user->name }}</h5>

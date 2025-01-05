@@ -52,10 +52,25 @@
         <div class="mb-4">
             <label for="category" class="form-label enhanced-label">Job Category</label>
             <select class="form-select rounded-3" id="category" name="category" required>
-                <option value="1">Plumbing</option>
-                <option value="2">Electrical</option>
-                <option value="3">Carpentry</option>
-                <option value="4">Cleaning</option>
+            <option selected>Category</option>
+                                    <option value="1">Electricity</option>
+                                    <option value="2">Plumbing</option>
+                                    <option value="3">Air Conditioning</option>
+                                    <option value="4">Carpentry</option>
+                                    <option value="5">Construction Works</option>
+                                    <option value="6">Gypsum Board</option>
+                                    <option value="7">Tiling</option>
+                                    <option value="8">Plastering</option>
+                                    <option value="9">Painting</option>
+                                    <option value="10">Special Decorations</option>
+                                    <option value="11">Building Restructuring</option>
+                                    <option value="12">Organizing and Cleaning Works</option>
+                                    <option value="13">General Maintenance</option>
+                                    <option value="14">Building Maintenance</option>
+                                    <option value="15">Building Decorations</option>
+                                    <option value="16">Interior Design</option>
+                                    <option value="17">Architectural Design</option>
+                                    <option value="18">Structural Design </option>
             </select>
         </div>
 
@@ -70,6 +85,14 @@
                 <input type="number" class="form-control rounded-3" id="budgetMax" name="budgetMax" placeholder="Enter maximum budget" required>
             </div>
         </div>
+
+        <div class="row mb-4">
+    <div class="col-md-12">
+        <label for="duration" class="form-label enhanced-label">Duration Days</label>
+        <input type="number" class="form-control rounded-3" id="duration" name="duration" placeholder="Enter Duration" required>
+    </div>
+</div>
+
 
         <!-- Skills Required -->
         <div class="mb-4">
