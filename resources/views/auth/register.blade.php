@@ -2,10 +2,13 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Laravel') }}</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <!-- Layout styles -->
+        <link rel="shortcut icon" href="{{asset('assets/images/favicon.png')}}" />
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
@@ -284,7 +287,6 @@
             .auth-image h1 {
                 font-size: 2rem;
             }
-            
         }
     </style>
 </head>
@@ -292,31 +294,25 @@
     <div class="auth-container">
         <div class="auth-image">
             <div>
-                <h1 style="text-align:center">   Tas'heel</h1>
+                <h1 style="text-align:center">Tas'heel</h1>
                 <p>Enter your credentials to access your account and continue your journey with us.</p>
-                
-              
-            </div>
-            <div>
-                
             </div>
             <div class="floating-shapes">
-            <img  src="{{ asset('assetsPages/img/15.gif') }}" alt=""style="width:100%;height:100%">
+                <img src="{{ asset('assetsPages/img/15.gif') }}" alt="" style="width:100%;height:100%">
             </div>
         </div>
 
         <div class="auth-content">
             <div class="auth-tabs">
                 <button class="active" id="loginTab">Sign In</button>
-                <button id="registerTab">Create Admin</button>
-            
             </div>
 
             <!-- Login Form -->
             <div class="form-section active" id="loginForm">
                 <form method="POST" action="{{ route('login') }}">
                     @csrf
-                    
+                
+      
                     <div class="input-group">
                         <label>Email address</label>
                         <input type="email" name="email" value="{{ old('email') }}" required>
@@ -340,129 +336,21 @@
 
                     <button type="submit" class="submit-button">Sign In</button>
 
-                    <div class="form-footer">
-                        @if (Route::has('password.request'))
-                            <a href="{{ route('password.request') }}">Forgot your password?</a>
-                        @endif
-                    </div>
+                    
+                    
                 </form>
             </div>
-
-            <!-- Register Form -->
-            <div class="form-section" id="registerForm">
-                <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
-                    @csrf
-                    <div class="input-group">
-                        <label>Full Name</label>
-                        <input type="text" name="name" value="{{ old('name') }}" required>
-                        @error('name')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="input-group">
-                        <label>Email address</label>
-                        <input type="email" name="email" value="{{ old('email') }}" required>
-                        @error('email')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="input-group">
-                        <label>Mobile Phone</label>
-                        <input type="tel" name="mobile_phone" value="{{ old('mobile_phone') }}" required>
-                        @error('mobile_phone')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="input-group">
-                        <label>Phone Number (optional)</label>
-                        <input type="tel" name="phone_number" value="{{ old('phone_number') }}">
-                        @error('phone_number')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="input-group">
-                        <label>User Role</label>
-                        <select name="user_role" required>
-                           
-                            <option value="admin" {{ old('user_role') === 'admin' ? 'selected' : '' }}>Admin</option>
-                        </select>
-                        @error('user_role')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="input-group">
-                        <label>Profile Image</label>
-                        <input type="file" name="profile_image">
-                        @error('profile_image')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="input-group">
-                        <label>Password</label>
-                        <input type="password" name="password" required>
-                        @error('password')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="input-group">
-                        <label>Confirm Password</label>
-                        <input type="password" name="password_confirmation" required>
-                    </div>
-
-                    <button type="submit" class="submit-button">Create Account</button>
-                </form>
-            </div>
-
-           
         </div>
     </div>
 
     <script>
         const loginTab = document.getElementById('loginTab');
-        const registerTab = document.getElementById('registerTab');
-      
         const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-       
+
         loginTab.addEventListener('click', () => {
             loginTab.classList.add('active');
-            registerTab.classList.remove('active');
-           
             loginForm.classList.add('active');
-            registerForm.classList.remove('active');
-          
         });
-
-        registerTab.addEventListener('click', () => {
-            registerTab.classList.add('active');
-            loginTab.classList.remove('active');
-          
-            registerForm.classList.add('active');
-            loginForm.classList.remove('active');
-           
-        });
-
-        registerTabT.addEventListener('click', () => {
-          
-            loginTab.classList.remove('active');
-            registerTab.classList.remove('active');
-         
-            loginForm.classList.remove('active');
-            registerForm.classList.remove('active');
-        });
-
-        @if($errors->hasAny(['name', 'mobile_phone', 'phone_number', 'user_role', 'profile_image', 'password_confirmation']))
-            registerTab.click();
-        @endif
-
-      
     </script>
 </body>
 </html>

@@ -37,7 +37,7 @@ use App\Http\Controllers\Page\ClientController as PageClientController;
 use App\Http\Controllers\Page\HomeController as PageHomeController;
 use App\Http\Controllers\Page\ContactController as PageContactController;
 use App\Http\Controllers\StripePaymentController;
-
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -52,19 +52,12 @@ use Illuminate\Support\Facades\Auth;
 // Home Route
 Route::get('/', [PageHomeController::class, 'index'])->name('index');
 
-
-
+// Stripe Payment Routes
 Route::controller(StripePaymentController::class)->group(function(){
-
     Route::get('stripe', 'stripe');
-
     Route::post('stripe', 'stripePost')->name('stripe.post');
-
-
     Route::get('stripe', [StripePaymentController::class, 'stripe'])->name('stripe');
-Route::post('stripe', [StripePaymentController::class, 'stripePost'])->name('stripe.post');
-
-
+    Route::post('stripe', [StripePaymentController::class, 'stripePost'])->name('stripe.post');
 });
 
 Route::get('/stripe-payment/{bid_id}', [StripePaymentController::class, 'stripePayment'])->name('stripe.payment');
@@ -91,10 +84,10 @@ Route::post('/technician/handle-bid-response', [PageTechnicianController::class,
     ->name('page.technicians.handleBidResponse')
     ->middleware(['auth', 'role:client']);
 
-    Route::post('/technician/respond-to-bid', [PageTechnicianController::class, 'respondToBid'])
+Route::post('/technician/respond-to-bid', [PageTechnicianController::class, 'respondToBid'])
     ->name('technician.respondToBid')
     ->middleware('auth');
-    
+
 // Technician Routes
 Route::prefix('technician')->group(function () {
     Route::get('/profile', [PageTechnicianController::class, 'createProfile'])->name('page.technicians.profile');
@@ -113,7 +106,6 @@ Route::prefix('technician')->group(function () {
     Route::get('/respond-to-bid/{bid_id}', [PageTechnicianController::class, 'showRespondToBidForm'])
         ->name('page.technicians.showRespondToBidForm')
         ->middleware(['auth', 'role:client']);
-        
 });
 
 // Contact Route
@@ -144,88 +136,60 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::prefix('admin')->middleware('role:admin')->group(function () {
         Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('admin.dashboard');
-       
         Route::resource('users', AdminUserController::class)->names('admin.users');
         Route::get('/admin/users/{id}', [AdminUserController::class, 'show']);
         Route::post('users/{id}/softDelete', [AdminUserController::class, 'softDelete'])->name('admin.users.softDelete');
         Route::post('users/{id}/restore', [AdminUserController::class, 'restore'])->name('admin.users.restore');
-        
-Route::resource('admins', AdminAdminController::class)->names('admin.admins');
-Route::get('/admin/admins/{id}', [AdminAdminController::class, 'show']);
-Route::post('admins/{id}/softDelete', [AdminAdminController::class, 'softDelete'])->name('admin.admins.softDelete');
-Route::post('admins/{id}/restore', [AdminAdminController::class, 'restore'])->name('admin.admins.restore');
-       
-Route::resource('technicians', AdminTechnicianController::class)->names('admin.technicians');
-Route::get('/admin/technicians/{id}', [AdminTechnicianController::class, 'show']);
-Route::post('technicians/{id}/softDelete', [AdminTechnicianController::class, 'softDelete'])->name('admin.technicians.softDelete');
-Route::post('technicians/{id}/restore', [AdminTechnicianController::class, 'restore'])->name('admin.technicians.restore');
-       
+        Route::resource('admins', AdminAdminController::class)->names('admin.admins');
+        Route::get('/admin/admins/{id}', [AdminAdminController::class, 'show']);
+        Route::post('admins/{id}/softDelete', [AdminAdminController::class, 'softDelete'])->name('admin.admins.softDelete');
+        Route::post('admins/{id}/restore', [AdminAdminController::class, 'restore'])->name('admin.admins.restore');
+        Route::resource('technicians', AdminTechnicianController::class)->names('admin.technicians');
+        Route::get('/admin/technicians/{id}', [AdminTechnicianController::class, 'show']);
+        Route::post('technicians/{id}/softDelete', [AdminTechnicianController::class, 'softDelete'])->name('admin.technicians.softDelete');
+        Route::post('technicians/{id}/restore', [AdminTechnicianController::class, 'restore'])->name('admin.technicians.restore');
         Route::resource('categories', AdminCategoryController::class)->names('admin.categories');
         Route::post('categories/{id}/soft-delete', [AdminCategoryController::class, 'softDelete'])->name('categories.softDelete');
         Route::post('categories/{id}/restore', [AdminCategoryController::class, 'restore'])->name('categories.restore');
         Route::post('categories/{id}', [AdminCategoryController::class, 'update'])->name('admin.categories.update');
-       
-       
         Route::resource('jobPostings', AdminJobPostingController::class)->names('admin.jobPostings');
         Route::get('/admin/jobPostings/{id}', [AdminJobPostingController::class, 'show']);
         Route::post('jobPostings/{id}/softDelete', [AdminJobPostingController::class, 'softDelete'])->name('admin.jobPostings.softDelete');
         Route::post('jobPostings/{id}/restore', [AdminJobPostingController::class, 'restore'])->name('admin.jobPostings.restore');
-        
-
-       
-       
- Route::resource('jobBids', AdminJobBidController::class)->names('admin.jobBids');
-Route::get('/admin/jobBids/{id}', [AdminJobBidController::class, 'show']);
-Route::post('jobBids/{id}/softDelete', [AdminJobBidController::class, 'softDelete'])->name('admin.jobBids.softDelete');
-Route::post('jobBids/{id}/restore', [AdminJobBidController::class, 'restore'])->name('admin.jobBids.restore');
-        
+        Route::resource('jobBids', AdminJobBidController::class)->names('admin.jobBids');
+        Route::get('/admin/jobBids/{id}', [AdminJobBidController::class, 'show']);
+        Route::post('jobBids/{id}/softDelete', [AdminJobBidController::class, 'softDelete'])->name('admin.jobBids.softDelete');
+        Route::post('jobBids/{id}/restore', [AdminJobBidController::class, 'restore'])->name('admin.jobBids.restore');
         Route::resource('escrowPayments', AdminEscrowPaymentController::class)->names('admin.escrowPayments');
         Route::get('escrowPayments/{id}/view', [AdminEscrowPaymentController::class, 'view'])->name('escrowPayments.view');
         Route::post('escrowPayments/{id}/softDelete', [AdminEscrowPaymentController::class, 'softDelete'])->name('admin.escrowPayments.softDelete');
         Route::post('escrowPayments/{id}/restore', [AdminEscrowPaymentController::class, 'restore'])->name('admin.escrowPayments.restore');
-       
-       
-
         Route::resource('payments', AdminPaymentController::class)->names('admin.payments');
-        
-    
-    
-    
         Route::resource('reviews', AdminReviewController::class)->names('admin.reviews');
         Route::get('reviews', [AdminReviewController::class, 'index'])->name('admin.reviews.index');
         Route::post('reviews/{id}/softDelete', [AdminReviewController::class, 'softDelete'])->name('admin.reviews.softDelete');
         Route::post('reviews/{id}/restore', [AdminReviewController::class, 'restore'])->name('admin.reviews.restore');
-       
-       
         Route::resource('disputes', AdminDisputeController::class)->names('admin.disputes');
         Route::get('/admin/disputes/{id}', [AdminDisputeController::class, 'show']);
         Route::post('disputes/{id}/softDelete', [AdminDisputeController::class, 'softDelete'])->name('admin.disputes.softDelete');
         Route::post('disputes/{id}/restore', [AdminDisputeController::class, 'restore'])->name('admin.disputes.restore');
-
-      
         Route::resource('contacts', AdminContactController::class)->names('admin.contacts');
         Route::get('/contacts/{id}', [AdminContactController::class, 'show'])->name('admin.contacts.show');
         Route::post('contacts/{id}/softDelete', [AdminContactController::class, 'softDelete'])->name('admin.contacts.softDelete');
         Route::post('contacts/{id}/restore', [AdminContactController::class, 'restore'])->name('admin.contacts.restore');
-       
-       
         Route::resource('adminActions', AdminAdminActionController::class)->names('admin.adminActions');
         Route::post('adminActions/{id}/soft-delete', [AdminAdminActionController::class, 'softDelete'])->name('admin.adminActions.softDelete');
         Route::post('adminActions/{id}/restore', [AdminAdminActionController::class, 'restore'])->name('admin.adminActions.restore');
         Route::post('adminActions/{id}', [AdminAdminActionController::class, 'update'])->name('admin.adminActions.update');
-        
-    
     });
 
     // Client Routes
     Route::prefix('client')->middleware('role:client')->group(function () {
         Route::get('/dashboard', [ClientDashboard::class, 'index'])->name('client.dashboard');
-        
         Route::resource('users', ClientUserController::class)->names('client.users');
         Route::post('users/{id}/softDelete', [ClientUserController::class, 'softDelete'])->name('client.users.softDelete');
         Route::post('users/{id}', [ClientUserController::class, 'update'])->name('client.users.update');
         Route::get('users/{userId}/view-profile', [ClientUserController::class, 'viewProfile']);
-
         Route::resource('jobPostings', ClientJobPostingController::class)->names('client.jobPostings');
         Route::resource('payments', ClientPaymentController::class)->names('client.payments');
         Route::resource('reviews', ClientReviewController::class)->names('client.reviews');
@@ -235,11 +199,9 @@ Route::post('jobBids/{id}/restore', [AdminJobBidController::class, 'restore'])->
     // Technician Routes
     Route::prefix('technician')->middleware('role:technician')->group(function () {
         Route::get('/dashboard', [TechnicianDashboard::class, 'index'])->name('technician.dashboard');
-
         Route::resource('technicians', TechnicianTechnicianController::class)->names('technician.technicians');
         Route::get('/technician/technicians/{id}', [TechnicianTechnicianController::class, 'show']);
         Route::put('/technician/technicians/{id}', [TechnicianTechnicianController::class, 'update']);
-
         Route::resource('jobBids', TechnicianJobBidController::class)->names('technician.jobBids');
         Route::resource('escrowPayments', TechnicianEscrowPaymentController::class)->names('technician.escrowPayments');
         Route::resource('payments', TechnicianPaymentController::class)->names('technician.payments');
@@ -248,4 +210,24 @@ Route::post('jobBids/{id}/restore', [AdminJobBidController::class, 'restore'])->
     });
 });
 
+// Admin Login Routes
+Route::get('/admin/login', [LoginController::class, 'showAdminLoginForm'])->name('admin.login');
+Route::post('/admin/login', [LoginController::class, 'adminLogin']);
+
+// Client/Technician Login Routes (Default Breeze Routes)
 require __DIR__.'/auth.php';
+
+// Admin Dashboard
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/dashboard', [AdminDashboard::class, 'index'])->name('admin.dashboard');
+});
+
+// Client Dashboard
+Route::middleware(['auth', 'role:client'])->group(function () {
+    Route::get('/client/dashboard', [ClientDashboard::class, 'index'])->name('client.dashboard');
+});
+
+// Technician Dashboard
+Route::middleware(['auth', 'role:technician'])->group(function () {
+    Route::get('/technician/dashboard', [TechnicianDashboard::class, 'index'])->name('technician.dashboard');
+});

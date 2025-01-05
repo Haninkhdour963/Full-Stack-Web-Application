@@ -5,8 +5,9 @@
     <meta content="" name="keywords">
     <meta content="" name="description">
 
-    <!-- Favicon -->
-    <link href="{{ asset('assetsPages/img/favicon.ico') }}" rel="icon">
+   
+      <!-- Layout styles -->
+      <link rel="shortcut icon" href="{{asset('assets/images/favicon.png')}}" />
    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Other styles and scripts -->
