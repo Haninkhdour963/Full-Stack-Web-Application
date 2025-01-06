@@ -14,7 +14,7 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Job Title</th>
-                                <th>Technician</th>
+                                <!-- <th>Technician</th> -->
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Subject</th>
@@ -28,7 +28,7 @@
                                 <tr id="contact-row-{{ $contact->id }}" class="{{ $contact->deleted_at ? 'text-muted' : '' }}">
                                     <td>{{ $contact->id }}</td>
                                     <td>{{ $contact->job->title ?? 'N/A' }}</td>
-                                    <td>{{ $contact->technician->name ?? 'N/A' }}</td>
+                                    <!-- <td>{{ $contact->technician->name ?? 'N/A' }}</td> -->
                                     <td>{{ $contact->name }}</td>
                                     <td>{{ $contact->email }}</td>
                                     <td>{{ $contact->subject }}</td>

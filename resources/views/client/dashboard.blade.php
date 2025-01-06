@@ -24,7 +24,7 @@
     <tr>
         <td>{{ $loop->iteration }}</td>
         <td>{{ $notification->data['message'] ?? 'No message' }}</td>
-        <td>${{ number_format($notification->data['bid_amount'] ?? 0, 2) }}</td>
+        <td>JOD {{ number_format($notification->data['bid_amount'] ?? 0, 2) }}</td>
         <td>{{ \Carbon\Carbon::parse($notification->data['payment_date'] ?? now())->format('Y-m-d') }} </td>
        
         <td id="action-{{ $notification->data['bid_id'] ?? 0 }}">
@@ -134,7 +134,7 @@
                                         Unknown Job Posting
                                     @endif
                                 </td>
-                                <td>${{ number_format($payment->amount, 2) }}</td>
+                                <td>JOD {{ number_format($payment->amount, 2) }}</td>
                                 <td><span class="badge badge-success">{{ $payment->payment_status }}</span></td>
                             </tr>
                         @endforeach

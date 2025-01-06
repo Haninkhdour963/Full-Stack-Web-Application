@@ -27,7 +27,7 @@
                                     <td>{{ $technician->id }}</td>
                                     <td>{{ $technician->identity_number }}</td>
                                     <td>{{ $technician->skills }}</td>
-                                    <td>${{ number_format($technician->hourly_rate, 2) }}</td>
+                                    <td>JOD {{ number_format($technician->hourly_rate, 2) }}</td>
                                     <td>{{ $technician->rating }}</td>
                                     <td>{{ $technician->location }}</td>
                                     <td>
@@ -144,7 +144,7 @@
                             html: `
                                 <strong>Identity Number:</strong> ${technician.identity_number}<br>
                                 <strong>Skills:</strong> ${technician.skills}<br>
-                                <strong>Hourly Rate:</strong> $${technician.hourly_rate}<br>
+                                <strong>Hourly Rate:</strong> ${technician.hourly_rate}<br>
                                 <strong>Rating:</strong> ${technician.rating}<br>
                                 <strong>Location:</strong> ${technician.location}<br>
                                 <strong>Bio:</strong> ${technician.bio}<br>

@@ -92,7 +92,7 @@
                                         Unknown Job Posting
                                     @endif
                                 </td>
-                                <td>${{ number_format($payment->amount_min, 2) }}</td>
+                                <td>JOD {{ number_format($payment->amount_min, 2) }}</td>
                                 <td><span class="badge badge-success">{{ $payment->status }}</span></td>
                                
                             </tr>

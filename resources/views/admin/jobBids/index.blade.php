@@ -12,20 +12,21 @@
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Technician</th>
+                                <!-- <th>Technician</th> -->
                                 <th>Job Posting</th>
-                                <th>Bid Amount</th>
                                 <th>Status</th>
                                 <th>Bid Date</th>
+                                
+                                <!-- <th>Bid Date</th> -->
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="jobBidsTableBody">
                             @foreach($jobBids as $jobBid)
                                 <tr id="jobBid-row-{{ $jobBid->id }}" class="{{ $jobBid->deleted_at ? 'text-muted' : '' }}">
-                                    <td>{{ optional($jobBid->technician)->name ?? 'N/A' }}</td>
+                                    <!-- <td>{{ optional($jobBid->technician)->name ?? 'N/A' }}</td> -->
                                     <td>{{ optional($jobBid->job)->title ?? 'N/A' }}</td>
-                                    <td>${{ number_format($jobBid->bid_amount, 2) }}</td>
+                                    <!-- <td>${{ number_format($jobBid->bid_amount, 2) }}</td> -->
                                     <td>
                                         @if($jobBid->status == 'pending')
                                             <span class="badge badge-warning">Pending</span>
@@ -37,7 +38,7 @@
                                             <span class="badge badge-secondary">Withdrawn</span>
                                         @endif
                                     </td>
-                                    <td>{{ $jobBid->bid_date ? $jobBid->bid_date->format('Y-m-d H:i:s') : 'N/A' }}</td>
+                                    <td>{{ $jobBid->bid_date ? $jobBid->bid_date->format('Y-m-d H:i:s') : now() }}</td>
                                     <td>
                                         <button class="btn btn-info btn-sm view-btn" data-id="{{ $jobBid->id }}">View</button>
                                         @if($jobBid->deleted_at)

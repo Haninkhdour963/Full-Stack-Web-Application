@@ -155,7 +155,9 @@
                         <i class="fa fa-quote-left fa-2x text-primary mb-3"></i>
                         <p>{{ $review->review_message }}</p>
                         <div class="d-flex align-items-center justify-content-center">
-                            <img class="img-fluid flex-shrink-0 rounded" src="{{ asset('path_to_images/'.$review->reviewer->profile_picture) }}" style="width: 50px; height: 50px;">
+                        <img class="img-fluid flex-shrink-0 rounded" src="{{ asset('storage/' . $review->reviewer->profile_image) }}" style="width: 50px; height: 50px;">
+
+                         
                             <div class="ps-3 text-center">
                                 <h5 class="mb-1">{{ $review->reviewer->name }}</h5>
                                 <small>{{ $review->job->title }}</small>

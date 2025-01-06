@@ -25,7 +25,7 @@
                                 <tr id="jobPosting-row-{{ $jobPosting->id }}" class="{{ $jobPosting->deleted_at ? 'text-muted' : '' }}">
                                     <td>{{ $jobPosting->title }}</td>
                                     <td>{{ $jobPosting->location }}</td>
-                                    <td>${{ number_format($jobPosting->budget_min, 2) }} - ${{ number_format($jobPosting->budget_max, 2) }}</td>
+                                    <td>JOD {{ number_format($jobPosting->budget_min, 2) }} - JOD {{ number_format($jobPosting->budget_max, 2) }}</td>
                                     <td>
                                         @if($jobPosting->status == 'open')
                                             <span class="badge badge-primary">Open</span>

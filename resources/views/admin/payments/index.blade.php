@@ -27,7 +27,7 @@
                                 <th>Amount</th>
                                 <th>Payment Date</th>
                                 <th>Job</th>
-                                <th>Technician</th>
+                                <th>Location</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -36,14 +36,15 @@
                                     <td>{{ $payment->id }}</td>
                                     <td>${{ number_format($payment->amount, 2) }}</td>
                                     <td>
-                                        @if($payment->payment_date)
-                                            {{ $payment->payment_date->format('Y-m-d') }}
-                                        @else
-                                            N/A
-                                        @endif
+                                    @if($payment->payment_date)
+    {{ $payment->payment_date->format('Y-m-d') }}
+@else
+    {{ now()->format('Y-m-d') }}
+@endif
+
                                     </td>
                                     <td>{{ $payment->job ? $payment->job->title : 'N/A' }}</td>
-                                    <td>{{ $payment->technician ? $payment->technician->user->name : 'N/A' }}</td>
+                                    <td>{{ $payment->job ? $payment->job->location : 'N/A' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

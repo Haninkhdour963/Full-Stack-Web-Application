@@ -69,7 +69,7 @@
                             <td>{{ $jobPost->title }}</td>
                             <td>{{ $jobPost->location }}</td>
                             <td>{{ $jobPost->category ? $jobPost->category->category_name : 'No category' }}</td>
-                            <td>${{ number_format($jobPost->budget_min, 2) }} - ${{ number_format($jobPost->budget_max, 2) }}</td>
+                            <td>JOD {{ number_format($jobPost->budget_min, 2) }} - JOD {{ number_format($jobPost->budget_max, 2) }}</td>
                             <td>{{ ucfirst($jobPost->status) }}</td>
                             <td>
                                 {{ $jobPost->posted_at ? $jobPost->posted_at->format('M d, Y') :now()}}
