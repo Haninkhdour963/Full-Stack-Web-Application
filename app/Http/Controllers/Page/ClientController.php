@@ -22,56 +22,61 @@ class ClientController extends Controller
     }
 
     public function createJobPost()
-    {
-        // Return the view for creating a job post
-        return view('page.clients.post');  // Ensure the view exists at resources/views/page/clients/createJobPost.blade.php
-    }
-
-   public function storeJobPost(Request $request)
 {
-    // Check if the user is authenticated
-    if (!auth()->check()) {
-        return redirect()->route('login')->with('error', 'You need to log in first!');
-    } else{
-        return redirect()->route('index')->with('error', 'You need to register as a client to create a job post.');
+    // Ensure the user is authenticated and has the 'client' role
+    if (!auth()->check() || auth()->user()->user_role !== 'client') {
+        return redirect()->route('login')->with('error', 'You need to log in as a client to create a job post.');
     }
 
-    // Check if the user has the 'client' role
-    if (auth()->user()->user_role !== 'client') {
-        return redirect()->route('register')->with('error', 'You need to register as a client to create a job post.');
-    }
+    // Fetch all categories from the database
+    $categories = Category::all();
 
-    $request->validate([
-        'jobTitle' => 'required|string|max:255',
-        'jobDescription' => 'required|string',
-        'location' => 'required|string|max:255',
-        'category' => 'required|integer',
-        'budgetMin' => 'required|numeric',
-        'budgetMax' => 'required|numeric',
-        'duration' => 'required|string|max:255',
-        'skills' => 'required|string',
-       
-
-    ]);
-
-    // Save the job post into the database
-    JobPosting::create([
-        'client_id' => auth()->user()->id, // Assuming the logged-in user is the client
-        'title' => $request->jobTitle,
-        'description' => $request->jobDescription,
-        'location' => $request->location,
-        'category_id' => $request->category,
-        'budget_min' => $request->budgetMin,
-        'budget_max' => $request->budgetMax,
-        'duration' => $request->duration,
-        'skills' => $request->skills,
-        'status' => 'open', // Default status (assuming the job is open)
-        'posted_at' => now(),
-    ]);
-
-    // Redirect to contract page after job is created
-    return redirect()->route('page.clients.contract')->with('success', 'Job post created successfully!');
+    // Return the view for creating a job post and pass the categories
+    return view('page.clients.post', compact('categories'));
 }
+
+    public function storeJobPost(Request $request)
+    {
+        // Check if the user is authenticated
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'You need to log in first!');
+        }
+    
+        // Check if the user has the 'client' role
+        if (auth()->user()->user_role !== 'client') {
+            return redirect()->route('register')->with('error', 'You need to register as a client to create a job post.');
+        }
+    
+        // Validate the request data
+        $request->validate([
+            'jobTitle' => 'required|string|max:255',
+            'jobDescription' => 'required|string',
+            'location' => 'required|string|max:255',
+            'category' => 'required|integer',
+            'budgetMin' => 'required|numeric',
+            'budgetMax' => 'required|numeric',
+            'duration' => 'required|string|max:255',
+            'skills' => 'required|string',
+        ]);
+    
+        // Save the job post into the database
+        JobPosting::create([
+            'client_id' => auth()->user()->id, // Assuming the logged-in user is the client
+            'title' => $request->jobTitle,
+            'description' => $request->jobDescription,
+            'location' => $request->location,
+            'category_id' => $request->category,
+            'budget_min' => $request->budgetMin,
+            'budget_max' => $request->budgetMax,
+            'duration' => $request->duration,
+            'skills' => $request->skills,
+            'status' => 'open', // Default status (assuming the job is open)
+            'posted_at' => now(),
+        ]);
+    
+        // Redirect to contract page after job is created
+        return redirect()->route('page.clients.contract')->with('success', 'Job post created successfully!');
+    }
 
 public function signContract(Request $request)
 {

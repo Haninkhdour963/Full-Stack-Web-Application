@@ -79,7 +79,7 @@
                             <th>#</th>
                             <th>User</th>
                             <th>Job Posting</th>
-                            <th>Payment Amount</th>
+                            <!-- <th>Payment Amount</th> -->
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -101,8 +101,8 @@
                                         Unknown Job Posting
                                     @endif
                                 </td>
-                                <td>${{ number_format($payment->amount_min, 2) }}</td>
-                                <td><span class="badge badge-success">{{ $payment->status }}</span></td>
+                                <!-- <td>${{ number_format($payment->bid_amount, 2) }}</td> -->
+                                <td><span class="badge badge-success">{{ $payment->payment_status }}</span></td>
                             </tr>
                         @endforeach
                     </tbody>

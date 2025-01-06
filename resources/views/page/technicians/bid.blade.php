@@ -68,8 +68,26 @@
                     <div class="text-start ps-4">
                         <h5 class="mb-3">{{ $job->title }}</h5>
                         <span class="text-truncate me-3"><i class="fa fa-user text-primary me-2"></i> {{ $job->client->name }}</span>
-                        <span class="text-truncate me-3"><i class="fa fa-map-marker-alt text-primary me-2"></i> {{ $job->status }}</span>
-                        <span class="text-truncate me-3"><i class="fa fa-map-marker-alt text-primary me-2"></i> {{ $job->location }}</span>
+                        <span class="text-truncate me-3">
+                        <span class="text-truncate me-3">
+                                   <span class="text-truncate me-3">
+    @if ($job->status === 'pending')
+        <i class="fa fa-clock me-2" style="color: #4A628A;"></i>
+    @elseif ($job->status === 'open')
+        <i class="fa fa-clock me-2" style="color: #4A628A;"></i>
+    @elseif ($job->status === 'in-progress')
+        <i class="fa fa-spinner me-2" style="color: #4A628A;"></i>
+    @elseif ($job->status === 'completed')
+        <i class="fa fa-check-circle me-2" style="color: #4A628A;"></i>
+    @elseif ($job->status === 'canceled')
+        <i class="fa fa-times-circle me-2" style="color: #4A628A;"></i>
+    @else
+        <i class="fa fa-info-circle me-2" style="color: #4A628A;"></i>
+    @endif
+    {{ $job->status }}
+</span>
+
+             <span class="text-truncate me-3"><i class="fa fa-map-marker-alt text-primary me-2"></i> {{ $job->location }}</span>
                         <span class="text-truncate me-3"><i class="far fa-clock text-primary me-2"></i>{{ $job->duration }} Days</span>
                         <span class="text-truncate me-0"><i class="far fa-money-bill-alt text-primary me-2"></i>JOD {{ number_format($job->budget_min, 2) }} - JOD {{ number_format($job->budget_max, 2) }}</span>
                     </div>

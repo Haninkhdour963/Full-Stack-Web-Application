@@ -135,7 +135,7 @@
                                     @endif
                                 </td>
                                 <td>${{ number_format($payment->amount, 2) }}</td>
-                                <td><span class="badge badge-success">{{ $payment->status }}</span></td>
+                                <td><span class="badge badge-success">{{ $payment->payment_status }}</span></td>
                             </tr>
                         @endforeach
                     </tbody>
