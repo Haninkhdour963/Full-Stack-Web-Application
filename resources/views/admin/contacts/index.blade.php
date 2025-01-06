@@ -41,12 +41,13 @@
                                         @endif
                                     </td>
                                     <td>
+                                      <button class="btn btn-info btn-sm view-btn" data-id="{{ $contact->id }}">View</button>
                                         @if($contact->deleted_at)
                                             <button class="btn btn-success btn-sm restore-btn" data-id="{{ $contact->id }}">Restore</button>
                                         @else
                                             <button class="btn btn-danger btn-sm soft-delete-btn" data-id="{{ $contact->id }}">Soft Delete</button>
                                         @endif
-                                        <button class="btn btn-info btn-sm view-btn" data-id="{{ $contact->id }}">View</button>
+                                        
                                     </td>
                                 </tr>
                             @endforeach

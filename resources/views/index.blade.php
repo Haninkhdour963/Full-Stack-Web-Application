@@ -86,19 +86,24 @@
                 <p>Found <span class="font-weight-bold">{{ $jobPostings->total() }}</span> results</p>
             </div>
             
-            <!-- Job Listings -->
-            <div class="row g-4" id="jobListings">
-                @foreach($categories as $category)
-                    <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.1s">
-                        <a class="cat-item rounded p-4 d-flex flex-column" href="{{ route('page.technicians.bid') }}">
-                        <i class="fa fa-3x text-primary mb-4 {{ $category->category_icon ? $category->category_icon : 'fa-question-circle' }}"></i>
+<!-- Job Listings -->
+<div class="row g-4" id="jobListings">
+    @foreach($categories as $category)
+        <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.1s">
+            <a class="cat-item rounded p-4 d-flex flex-column align-items-center justify-content-center text-center" href="{{ route('page.technicians.bid') }}">
+                <!-- Display the category icon -->
+                <i class="mb-4 {{ $category->category_icon ? $category->category_icon : 'fa-question-circle' }}"></i>
+                
+                <!-- Category image (if exists) -->
+                <img src="{{ asset('storage/' . $category->category_icon) }}" alt="Category Image" width="70" class="mb-3">
+                
+                <h6 class="mb-3">{{ $category->category_name }}</h6>
+                <p class="mb-0">{{ $category->description }}</p>
+            </a>
+        </div>
+    @endforeach
+</div>
 
-                            <h6 class="mb-3">{{ $category->category_name }}</h6>
-                            <p class="mb-0">{{ $category->description }}</p>
-                        </a>
-                    </div>
-                @endforeach
-            </div>
 
             <!-- Pagination Links -->
             <div class="d-flex justify-content-center mt-4" id="pagination">
