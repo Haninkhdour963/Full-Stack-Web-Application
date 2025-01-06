@@ -69,7 +69,7 @@
                                                     @endif
                                                 </span>
                                                 <span class="text-truncate me-0">
-                                                    <i class="far fa-money-bill-alt text-primary me-2"></i>${{ number_format($technician->hourly_rate, 2) }}/hour
+                                                    <i class="far fa-money-bill-alt text-primary me-2"></i>JOD {{ number_format($technician->hourly_rate, 2) }}/hour
                                                 </span>
                                             </div>
                                         </div>

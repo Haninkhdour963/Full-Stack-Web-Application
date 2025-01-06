@@ -93,7 +93,7 @@
                             <span>{{ $technician->location }}</span>
                         </div>
                     </div>
-                    <p class="mb-2"><strong style="color: #4A628A;">Hourly Rate:</strong> ${{ number_format($technician->hourly_rate, 2) }}/hour</p>
+                    <p class="mb-2"><strong style="color: #4A628A;">Hourly Rate:</strong> JOD {{ number_format($technician->hourly_rate, 2) }}/hour</p>
                     <p class="mb-2"><strong style="color: #4A628A;">Skills:</strong> {{ $technician->skills }}</p>
                     <p class="mb-0"><strong style="color: #4A628A;">Bio:</strong> {{ $technician->bio }}</p>
                 </div>

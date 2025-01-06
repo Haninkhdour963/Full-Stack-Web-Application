@@ -32,7 +32,7 @@
         <div class="card card-customers">
             <div class="card-body">
                 <h4 class="card-title">Escrow Payments</h4>
-                <p>${{ number_format($totalEscrowPayments, 2) }}</p>
+                <p>JOD {{ number_format($totalEscrowPayments, 2) }}</p>
             </div>
         </div>
     </div>

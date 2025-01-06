@@ -68,7 +68,7 @@
                             <tr>
                                 <td>{{ $bid->job ? $bid->job->title : 'No Job' }}</td>
                                 <td>{{ $bid->job ? $bid->job->location : 'No Location' }}</td>
-                                <td>${{ number_format($bid->bid_amount, 2) }}</td>
+                                <td>JOD {{ number_format($bid->bid_amount, 2) }}</td>
                                 <td>
                                     <span class="badge 
                                         @if($bid->status == 'pending') bg-warning 

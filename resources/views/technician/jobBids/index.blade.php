@@ -26,7 +26,7 @@
                                     <!-- <td>{{ $jobBid->technician->user->name ?? 'N/A' }}</td> -->
                                     <td>{{ $jobBid->job->title ?? 'N/A' }}</td>
                                     <td>{{ $jobBid->job->location ?? 'N/A' }}</td>
-                                    <td>${{ number_format($jobBid->bid_amount, 2) }}</td>
+                                    <td>JOD {{ number_format($jobBid->bid_amount, 2) }}</td>
                                     <td>
                                         @if($jobBid->status == 'pending')
                                             <span class="badge badge-warning">Pending</span>

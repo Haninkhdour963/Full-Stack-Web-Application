@@ -16,8 +16,8 @@
                                 <th>Job Title</th>
                                 <th>Reviewer</th>
                                 <th>Reviewee</th>
-                                <th>Rating</th>
-                                <th>Comment</th>
+                                <!-- <th>Rating</th>
+                                <th>Comment</th> -->
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -29,8 +29,8 @@
                                     <td>{{ $review->job->title ?? 'N/A' }}</td>
                                     <td>{{ $review->reviewer->name ?? 'N/A' }}</td>
                                     <td>{{ $review->reviewee->name ?? 'N/A' }}</td>
-                                    <td>{{ $review->rating }}</td>
-                                    <td>{{ $review->comment }}</td>
+                                    <!-- <td>{{ $review->rating }}</td>
+                                    <td>{{ $review->comment }}</td> -->
                                     <td>
                                         @if($review->deleted_at)
                                             <span class="badge badge-danger">Deleted</span>
