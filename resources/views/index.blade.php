@@ -91,7 +91,8 @@
                 @foreach($categories as $category)
                     <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.1s">
                         <a class="cat-item rounded p-4 d-flex flex-column" href="{{ route('page.technicians.bid') }}">
-                            <i class="fa fa-3x fa-mail-bulk text-primary mb-4"></i>
+                        <i class="fa fa-3x text-primary mb-4 {{ $category->category_icon ? $category->category_icon : 'fa-question-circle' }}"></i>
+
                             <h6 class="mb-3">{{ $category->category_name }}</h6>
                             <p class="mb-0">{{ $category->description }}</p>
                         </a>

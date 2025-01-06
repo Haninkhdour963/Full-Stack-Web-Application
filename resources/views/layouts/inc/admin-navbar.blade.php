@@ -42,14 +42,24 @@
                 </a>
                 <div class="dropdown-menu navbar-dropdown" aria-labelledby="profileDropdown">
                     <div class="dropdown-divider"></div>
+
+
+                    <a class="dropdown-item" href="{{ route('index') }}">
+                       <i class="mdi mdi-logout me-2 text-primary"></i> Back to Site
+                      </a>
+
+
                     <a class="dropdown-item" href="{{ route('logout') }}" 
                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                         <i class="mdi mdi-logout me-2 text-primary"></i> Signout
                     </a>
+                    
+
                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                         @csrf
                     </form>
                 </div>
+                
             </li>
         </ul>
         <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"

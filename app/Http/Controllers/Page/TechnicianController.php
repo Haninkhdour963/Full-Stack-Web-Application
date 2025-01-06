@@ -218,8 +218,8 @@ public function paymentSuccess(Request $request)
 
     
     public function createProfile(){
-        // return view('page.technicians.profile');
-        return redirect()->route('login')->with('error', 'You need to register as a technician to create a profile.');
+        return view('auth.login');
+        // return redirect()->route('login')->with('error', 'You need to register as a technician to create a profile.');
         
     }
  

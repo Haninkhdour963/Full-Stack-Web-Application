@@ -173,10 +173,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/admin/disputes/{id}', [AdminDisputeController::class, 'show']);
         Route::post('disputes/{id}/softDelete', [AdminDisputeController::class, 'softDelete'])->name('admin.disputes.softDelete');
         Route::post('disputes/{id}/restore', [AdminDisputeController::class, 'restore'])->name('admin.disputes.restore');
+       
         Route::resource('contacts', AdminContactController::class)->names('admin.contacts');
         Route::get('/contacts/{id}', [AdminContactController::class, 'show'])->name('admin.contacts.show');
         Route::post('contacts/{id}/softDelete', [AdminContactController::class, 'softDelete'])->name('admin.contacts.softDelete');
         Route::post('contacts/{id}/restore', [AdminContactController::class, 'restore'])->name('admin.contacts.restore');
+        
         Route::resource('adminActions', AdminAdminActionController::class)->names('admin.adminActions');
         Route::post('adminActions/{id}/soft-delete', [AdminAdminActionController::class, 'softDelete'])->name('admin.adminActions.softDelete');
         Route::post('adminActions/{id}/restore', [AdminAdminActionController::class, 'restore'])->name('admin.adminActions.restore');
