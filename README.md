@@ -10,8 +10,8 @@ complete the work, which helps improve the quality of service.
 3. Continuous technical support: Providing technical support to application users 
 around the clock. 
 4. Guarantees: Guarantees to the customer and technicians to ensure a safe and 
-reliable user experience. 
-5 Objective: The creation of the Tas 'heel website and application will enhance work 
+reliable user experience.
+ Objective: The creation of the Tas 'heel website and application will enhance work 
 effectiveness in the labor sector, improve the level of services provided, and 
 enhance relations between customers and technicians.
 
