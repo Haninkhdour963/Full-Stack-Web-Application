@@ -1,3 +1,22 @@
+The idea aims to facilitate the recruitment process and communication between customers and workers in various fields, including electricity, air conditioning, carpentry, and 
+construction work. The application will provide an integrated platform that allows the customer to search for suitable technicians while allowing technicians to display 
+their skills and services, facilitating access to skilled workers. 
+#Main_features_of_the_application: 
+1. Secure financial reservation: where the amounts paid by customers are reserved 
+until the completion of the work is confirmed, which guarantees the rights of both 
+parties. 
+2. Evaluation system: This system allows customers to evaluate technicians after they 
+complete the work, which helps improve the quality of service. 
+3. Continuous technical support: Providing technical support to application users 
+around the clock. 
+4. Guarantees: Guarantees to the customer and technicians to ensure a safe and 
+reliable user experience. 
+5 Objective: The creation of the Tas 'heel website and application will enhance work 
+effectiveness in the labor sector, improve the level of services provided, and 
+enhance relations between customers and technicians.
+
+
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
